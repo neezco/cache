@@ -1,0 +1,30 @@
+{
+  "name": "@danhezcode/ts-template",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test": "node --test",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "20.3.0",
+    "@commitlint/config-conventional": "20.3.0",
+    "@eslint/js": "9.39.2",
+    "@types/bun": "latest",
+    "eslint": "9.39.2",
+    "eslint-import-resolver-typescript": "4.4.4",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-react": "7.37.5",
+    "globals": "17.0.0",
+    "husky": "9.1.7",
+    "prettier": "3.7.4",
+    "typescript-eslint": "8.51.0"
+  },
+  "peerDependencies": {
+    "typescript": "5"
+  }
+}

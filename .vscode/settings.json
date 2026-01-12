@@ -1,0 +1,15 @@
+{
+  "cSpell.language": "en,es,es-ES",
+
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.useFlatConfig": true,
+  "eslint.run": "onType",
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+
+  "git.enableCommitSigning": true
+}

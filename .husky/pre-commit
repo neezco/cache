@@ -1,0 +1,4 @@
+pnpm lint:fix
+pnpm format
+pnpm typecheck
+pnpm test
