@@ -90,11 +90,11 @@ export interface CacheEntry {
   /** The stored value. */
   v: unknown;
 
-  /** Absolute timestamp when the entry becomes invalid (Date.now() + TTL). */
-  expiresAt: number;
+  /** expiresAt: Absolute timestamp when the entry becomes invalid (Date.now() + TTL). */
+  e: number;
 
-  /** Absolute timestamp when the entry stops being stale (Date.now() + staleTTL). */
-  staleExpiresAt?: number;
+  /** staleExpiresAt: Absolute timestamp when the entry stops being stale (Date.now() + staleTTL). */
+  se?: number;
 }
 
 /**
