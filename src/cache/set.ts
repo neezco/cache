@@ -20,7 +20,6 @@ export const setOrUpdate = (
 
   if (key == null) throw new Error("Missing key.");
   if (value == null) throw new Error("Missing value.");
-  if (ttlMs == null) throw new Error("Missing ttlMs.");
 
   const ttl = ttlMs ?? state.defaultTTL;
   const staleTTL = staleTTLMs ?? state.defaultStaleTTL;
@@ -59,7 +58,7 @@ export interface CacheSetOrUpdateInput {
   /**
    * TTL (Time-To-Live) in milliseconds for this entry.
    */
-  ttlMs: number;
+  ttlMs?: number;
 
   /**
    * Optional stale TTL in milliseconds for this entry.

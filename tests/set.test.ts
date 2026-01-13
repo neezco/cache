@@ -40,13 +40,6 @@ describe("setOrUpdate", () => {
     );
   });
 
-  it("should throw error if ttlMs is missing", () => {
-    const state = createCache();
-    expect(() =>
-      setOrUpdate(state, { key: "key1", value: "value1", ttlMs: null as unknown as number }),
-    ).toThrow("Missing ttlMs.");
-  });
-
   it("should throw error if ttlMs is not finite", () => {
     const state = createCache();
     expect(() => setOrUpdate(state, { key: "key1", value: "value1", ttlMs: NaN })).toThrow(
@@ -64,9 +57,9 @@ describe("setOrUpdate", () => {
   it("should use defaultTTL if not provided in input", () => {
     const state = createCache({ defaultTTL: 2000 });
     const now = Date.now();
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1" }, now);
     const entry = state.store.get("key1");
-    expect(entry!.e).toBe(now + 1000);
+    expect(entry!.e).toBe(now + 2000);
   });
 
   it("should use defaultStaleTTL if staleTTLMs not provided", () => {
