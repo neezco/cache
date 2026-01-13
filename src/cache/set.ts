@@ -18,8 +18,8 @@ export const setOrUpdate = (
 ): void => {
   const { key, value, ttlMs, staleTTLMs } = input;
 
+  if (value === undefined) return;
   if (key == null) throw new Error("Missing key.");
-  if (value == null) throw new Error("Missing value.");
 
   const ttl = ttlMs ?? state.defaultTTL;
   const staleTTL = staleTTLMs ?? state.defaultStaleTTL;
@@ -51,7 +51,12 @@ export interface CacheSetOrUpdateInput {
   key: string;
 
   /**
-   * Value to store in the cache.
+   * Value to be written to the cache.
+   *
+   * Considerations:
+   * - Always overwrites any previous value, if one exists.
+   * - `undefined` is ignored, leaving any previous value intact, if one exists.
+   * - `null` is explicitly stored as a null value, replacing any previous value, if one exists.
    */
   value: unknown;
 

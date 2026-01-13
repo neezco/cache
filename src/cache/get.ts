@@ -13,7 +13,7 @@ import { isFresh, isStale } from "./validators";
 export const get = (state: CacheState, key: string, now: number = Date.now()): unknown => {
   const entry = state.store.get(key);
 
-  if (!entry) return null;
+  if (!entry) return undefined;
 
   if (isFresh(entry, now)) return entry.v;
 
@@ -27,5 +27,5 @@ export const get = (state: CacheState, key: string, now: number = Date.now()): u
   // If it expired, always delete it
   deleteKey(state, key, DELETE_REASON.EXPIRED);
 
-  return null;
+  return undefined;
 };

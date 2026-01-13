@@ -4,9 +4,10 @@ import { createCache } from "../src/cache/create-cache";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("setOrUpdate", () => {
+  const now = Date.now();
+
   it("should set a valid entry", () => {
     const state = createCache();
-    const now = Date.now();
     setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 }, now);
     const entry = state.store.get("key1");
     expect(entry).toBeDefined();
@@ -17,12 +18,9 @@ describe("setOrUpdate", () => {
 
   it("should set entry with staleTTLMs", () => {
     const state = createCache();
-    const now = Date.now();
     setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000, staleTTLMs: 2000 }, now);
+
     const entry = state.store.get("key1");
-    expect(entry).toBeDefined();
-    expect(entry!.v).toBe("value1");
-    expect(entry!.e).toBe(now + 1000);
     expect(entry!.se).toBe(now + 2000);
   });
 
@@ -33,11 +31,22 @@ describe("setOrUpdate", () => {
     ).toThrow("Missing key.");
   });
 
-  it("should throw error if value is missing", () => {
+  it("should set entry with null value", () => {
     const state = createCache();
-    expect(() => setOrUpdate(state, { key: "key1", value: null, ttlMs: 1000 })).toThrow(
-      "Missing value.",
-    );
+    setOrUpdate(state, { key: "key1", value: null }, now);
+
+    const entry = state.store.get("key1");
+    expect(entry!.v).toBe(null);
+  });
+
+  it("should ignore entry with undefined value", () => {
+    const state = createCache();
+
+    setOrUpdate(state, { key: "key1", value: "before" }, now);
+    setOrUpdate(state, { key: "key1", value: undefined }, now);
+
+    const entry = state.store.get("key1");
+    expect(entry!.v).toBe("before");
   });
 
   it("should throw error if ttlMs is not finite", () => {
@@ -56,16 +65,16 @@ describe("setOrUpdate", () => {
 
   it("should use defaultTTL if not provided in input", () => {
     const state = createCache({ defaultTTL: 2000 });
-    const now = Date.now();
     setOrUpdate(state, { key: "key1", value: "value1" }, now);
+
     const entry = state.store.get("key1");
     expect(entry!.e).toBe(now + 2000);
   });
 
   it("should use defaultStaleTTL if staleTTLMs not provided", () => {
     const state = createCache({ defaultStaleTTL: 3000 });
-    const now = Date.now();
     setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 }, now);
+
     const entry = state.store.get("key1");
     expect(entry!.se).toBe(now + 3000);
   });
