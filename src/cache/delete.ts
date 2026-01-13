@@ -1,6 +1,6 @@
 import type { CacheState } from "../types";
 
-export const enum DeleteReason {
+export const enum DELETE_REASON {
   MANUAL = "manual",
   EXPIRED = "expired",
 }
@@ -14,7 +14,7 @@ export const enum DeleteReason {
 export const deleteKey = (
   state: CacheState,
   key: string,
-  reason: DeleteReason = DeleteReason.MANUAL,
+  reason: DELETE_REASON = DELETE_REASON.MANUAL,
 ): boolean => {
   const onDelete = state.onDelete;
 
