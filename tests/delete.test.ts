@@ -12,7 +12,7 @@ describe("deleteKey", () => {
 
   it("should return true and delete existing key", () => {
     const state = createCache();
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 });
     expect(deleteKey(state, "key1")).toBe(true);
     expect(state.store.has("key1")).toBe(false);
   });
@@ -20,7 +20,7 @@ describe("deleteKey", () => {
   it("should call onDelete callback when deleting existing key", () => {
     const onDelete = vi.fn();
     const state = createCache({ onDelete });
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 });
     deleteKey(state, "key1");
     expect(onDelete).toHaveBeenCalledWith("key1", "value1", DELETE_REASON.MANUAL);
   });
@@ -35,7 +35,7 @@ describe("deleteKey", () => {
   it("should delete with EXPIRED reason", () => {
     const onDelete = vi.fn();
     const state = createCache({ onDelete });
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 });
     deleteKey(state, "key1", DELETE_REASON.EXPIRED);
     expect(onDelete).toHaveBeenCalledWith("key1", "value1", DELETE_REASON.EXPIRED);
   });

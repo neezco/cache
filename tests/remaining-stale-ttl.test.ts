@@ -17,7 +17,7 @@ describe("remainingStaleTTL", () => {
     const now = Date.now();
 
     // TTL futuro → no expirado
-    setOrUpdate(state, { key: "k1", value: "v", ttlMs: 1000 }, now);
+    setOrUpdate(state, { key: "k1", value: "v", ttl: 1000 }, now);
 
     // se = undefined, entry no expirado → se ?? 0 → Math.max(0, 0 - now) → 0
     expect(remainingStaleTTL(state, "k1", now + 10)).toBe(0);
@@ -26,7 +26,7 @@ describe("remainingStaleTTL", () => {
   it("returns remaining stale TTL when entry has stale TTL", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "k1", value: "v", ttlMs: 100, staleTTLMs: 200 }, now);
+    setOrUpdate(state, { key: "k1", value: "v", ttl: 100, staleTtl: 200 }, now);
 
     // stale expires at now + 200 → at now + 150 → 50ms left
     expect(remainingStaleTTL(state, "k1", now + 150)).toBe(50);
@@ -35,7 +35,7 @@ describe("remainingStaleTTL", () => {
   it("returns 0 when stale TTL has passed", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "k1", value: "v", ttlMs: 100, staleTTLMs: 200 }, now);
+    setOrUpdate(state, { key: "k1", value: "v", ttl: 100, staleTtl: 200 }, now);
 
     // stale expired at now + 200 → now + 350 is expired
     expect(remainingStaleTTL(state, "k1", now + 350)).toBe(0);
@@ -44,7 +44,7 @@ describe("remainingStaleTTL", () => {
   it("returns 0 when entry is expired (even if stale TTL exists)", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "k1", value: "v", ttlMs: 50, staleTTLMs: 200 }, now);
+    setOrUpdate(state, { key: "k1", value: "v", ttl: 50, staleTtl: 200 }, now);
 
     const later = now + 220;
 

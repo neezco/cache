@@ -14,10 +14,10 @@ describe("size", () => {
   it("should return the number of entries in the cache", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 });
     expect(size(state)).toBe(1);
 
-    setOrUpdate(state, { key: "key2", value: "value2", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key2", value: "value2", ttl: 1000 });
     expect(size(state)).toBe(2);
   });
 });

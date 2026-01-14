@@ -10,14 +10,14 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
   const {
     onExpire,
     onDelete,
-    defaultTTL = 1000 * 60 * 5, // 5 minutes
+    defaultTtl = 1000 * 60 * 5, // 5 minutes
     maxSize = 100_000,
     maxSizeMB = 512, // MB
     sweepIntervalMs = 250,
     keysPerBatch = 500,
     sweepTimeBudgetMs = 30,
     sweepExpiredRatio = 0.3,
-    defaultStaleTTL = 0,
+    defaultStaleTtl = 0,
     purgeStaleOnGet = false,
     purgeStaleOnSweep = false,
     autoStartSweep = true,
@@ -32,8 +32,8 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     onDelete,
     maxSizeMB,
     maxSize,
-    defaultTTL,
-    defaultStaleTTL,
+    defaultTtl,
+    defaultStaleTtl,
     sweepTimeBudgetMs,
     sweepExpiredRatio,
     sweepIntervalMs,

@@ -4,7 +4,7 @@ import type { CacheState, CacheEntry } from "../types";
  * Sets or updates a value in the cache with TTL and optional stale TTL.
  *
  * @param state - The cache state.
- * @param input - Cache entry definition (key, value, ttlMs, staleMs).
+ * @param input - Cache entry definition (key, value, ttl, staleMs).
  * @param now - Optional timestamp override used as the base time (defaults to Date.now()).
  *
  * @returns void
@@ -16,13 +16,13 @@ export const setOrUpdate = (
   /** @internal */
   now: number = Date.now(),
 ): void => {
-  const { key, value, ttlMs, staleTTLMs } = input;
+  const { key, value, ttl: ttlInput, staleTtl: staleTtlInput } = input;
 
   if (value === undefined) return;
   if (key == null) throw new Error("Missing key.");
 
-  const ttl = ttlMs ?? state.defaultTTL;
-  const staleTTL = staleTTLMs ?? state.defaultStaleTTL;
+  const ttl = ttlInput ?? state.defaultTtl;
+  const staleTTL = staleTtlInput ?? state.defaultStaleTtl;
 
   if (!Number.isFinite(ttl)) {
     throw new Error("TTL must be a finite number.");
@@ -63,12 +63,12 @@ export interface CacheSetOrUpdateInput {
   /**
    * TTL (Time-To-Live) in milliseconds for this entry.
    */
-  ttlMs?: number;
+  ttl?: number;
 
   /**
    * Optional stale TTL in milliseconds for this entry.
    * When provided, the entry may be served as stale after TTL
    * but before stale TTL expires.
    */
-  staleTTLMs?: number;
+  staleTtl?: number;
 }

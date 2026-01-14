@@ -23,12 +23,12 @@ export interface CacheConfigBase {
    * Default TTL (Time-To-Live) in milliseconds for entries without explicit TTL.
    * @default 300_000 (5 minutes)
    */
-  defaultTTL: number;
+  defaultTtl: number;
 
   /**
    * Default stale TTL in milliseconds for entries without explicit stale TTL.
    */
-  defaultStaleTTL: number;
+  defaultStaleTtl: number;
 
   /**
    * Maximum number of entries the cache can hold.

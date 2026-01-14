@@ -20,9 +20,9 @@ describe("sweep", () => {
     vi.setSystemTime(now);
 
     // Set an expired entry
-    setOrUpdate(state, { key: "expired", value: "val", ttlMs: 100 });
+    setOrUpdate(state, { key: "expired", value: "val", ttl: 100 });
     // Set a fresh entry
-    setOrUpdate(state, { key: "fresh", value: "val", ttlMs: 1000 });
+    setOrUpdate(state, { key: "fresh", value: "val", ttl: 1000 });
 
     // Advance time past expiration
     vi.setSystemTime(now + 200);
@@ -42,9 +42,9 @@ describe("sweep", () => {
     vi.setSystemTime(now);
 
     // Set an entry with stale TTL
-    setOrUpdate(state, { key: "stale", value: "val", ttlMs: 100, staleTTLMs: 500 });
+    setOrUpdate(state, { key: "stale", value: "val", ttl: 100, staleTtl: 500 });
     // Set a fresh entry
-    setOrUpdate(state, { key: "fresh", value: "val", ttlMs: 1000 });
+    setOrUpdate(state, { key: "fresh", value: "val", ttl: 1000 });
 
     // Advance time past stale period
     vi.setSystemTime(now + 250);
@@ -64,9 +64,9 @@ describe("sweep", () => {
     vi.setSystemTime(now);
 
     // Set an entry with stale TTL
-    setOrUpdate(state, { key: "stale", value: "val", ttlMs: 100, staleTTLMs: 200 });
+    setOrUpdate(state, { key: "stale", value: "val", ttl: 100, staleTtl: 200 });
     // Set a fresh entry
-    setOrUpdate(state, { key: "fresh", value: "val", ttlMs: 1000 });
+    setOrUpdate(state, { key: "fresh", value: "val", ttl: 1000 });
 
     // Advance time to stale period
     vi.setSystemTime(now + 150);
@@ -85,9 +85,9 @@ describe("sweep", () => {
     const now = Date.now();
     vi.setSystemTime(now);
 
-    setOrUpdate(state, { key: "expired1", value: "val", ttlMs: 100 });
-    setOrUpdate(state, { key: "expired2", value: "val", ttlMs: 100 });
-    setOrUpdate(state, { key: "fresh", value: "val", ttlMs: 1000 });
+    setOrUpdate(state, { key: "expired1", value: "val", ttl: 100 });
+    setOrUpdate(state, { key: "expired2", value: "val", ttl: 100 });
+    setOrUpdate(state, { key: "fresh", value: "val", ttl: 1000 });
 
     vi.setSystemTime(now + 200);
 
@@ -122,10 +122,10 @@ describe("sweep", () => {
 
     vi.setSystemTime(now);
 
-    setOrUpdate(state, { key: "expired1", value: "val", ttlMs: 100 });
-    setOrUpdate(state, { key: "expired2", value: "val", ttlMs: 100 });
-    setOrUpdate(state, { key: "expired3", value: "val", ttlMs: 100 });
-    setOrUpdate(state, { key: "expired4", value: "val", ttlMs: 100 });
+    setOrUpdate(state, { key: "expired1", value: "val", ttl: 100 });
+    setOrUpdate(state, { key: "expired2", value: "val", ttl: 100 });
+    setOrUpdate(state, { key: "expired3", value: "val", ttl: 100 });
+    setOrUpdate(state, { key: "expired4", value: "val", ttl: 100 });
 
     vi.setSystemTime(now + 200);
 
@@ -150,7 +150,6 @@ describe("sweep", () => {
 
     expect(schedule).toHaveBeenCalledTimes(1);
 
-    console.log("🚀 ~ callbacks:", callbacks);
     callbacks[0]?.();
     expect(schedule).toHaveBeenCalledTimes(2);
 

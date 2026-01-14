@@ -15,8 +15,8 @@ describe("entries", () => {
   it("should return an iterator over the cache entries", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttlMs: 1000 });
-    setOrUpdate(state, { key: "key2", value: "value2", ttlMs: 1000 });
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 });
+    setOrUpdate(state, { key: "key2", value: "value2", ttl: 1000 });
 
     const iterator = entries(state);
     const result = Array.from(iterator);
