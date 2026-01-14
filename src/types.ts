@@ -1,3 +1,5 @@
+import type { DELETE_REASON } from "./cache/delete";
+
 /**
  * Base configuration shared between CacheOptions and CacheState.
  */
@@ -13,9 +15,9 @@ export interface CacheConfigBase {
    * Callback invoked when a key is deleted, either manually or due to expiration.
    * @param key - The deleted key.
    * @param value - The value of the deleted key.
-   * @param reason - The reason for deletion ('manual' or 'expired').
+   * @param reason - The reason for deletion ('manual', 'expired', or 'stale').
    */
-  onDelete?: (key: string, value: unknown, reason: "manual" | "expired") => void;
+  onDelete?: (key: string, value: unknown, reason: DELETE_REASON) => void;
 
   /**
    * Default TTL (Time-To-Live) in milliseconds for entries without explicit TTL.
@@ -84,6 +86,26 @@ export interface CacheConfigBase {
    * @default false
    */
   purgeStaleOnGet: boolean;
+
+  /**
+   * Controls how stale entries are handled during sweep operations.
+   *
+   * - true  → stale entries are purged during sweeps.
+   * - false → stale entries are retained during sweeps.
+   *
+   * @default false
+   */
+  purgeStaleOnSweep: boolean;
+
+  /**
+   * Whether to automatically start the sweep process when the cache is created.
+   *
+   * - true  → sweep starts automatically.
+   * - false → sweep does not start automatically, allowing manual control.
+   *
+   * @default true
+   */
+  autoStartSweep: boolean;
 }
 
 /**
@@ -128,5 +150,8 @@ export interface CacheState extends CacheConfigBase {
   processMemory: boolean;
 
   /** Iterator for sweeping keys. */
-  //   _sweepIter: Generator<string | null, void, unknown>;
+  entries: MapIterator<[string, CacheEntry]>;
+
+  /** Iterator for sweeping keys. */
+  _sweepIter: MapIterator<[string, CacheEntry]> | null;
 }

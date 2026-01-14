@@ -1,3 +1,4 @@
+import { sweep } from "../sweep/sweep";
 import type { CacheOptions, CacheState } from "../types";
 
 /**
@@ -18,6 +19,8 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     sweepExpiredRatio = 0.3,
     defaultStaleTTL = 0,
     purgeStaleOnGet = false,
+    purgeStaleOnSweep = false,
+    autoStartSweep = true,
   } = options;
 
   const state: CacheState = {
@@ -25,6 +28,10 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     get size() {
       return this.store.size;
     },
+    get entries() {
+      return this.store.entries();
+    },
+    _sweepIter: null,
     currentSize: 0,
     processMemory: false,
     onExpire,
@@ -38,7 +45,14 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     sweepIntervalMs,
     keysPerBatch,
     purgeStaleOnGet,
+    purgeStaleOnSweep,
+    autoStartSweep,
   };
+
+  // Start the sweep process
+  if (autoStartSweep) {
+    void sweep(state);
+  }
 
   return state;
 };

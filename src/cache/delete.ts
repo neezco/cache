@@ -3,6 +3,7 @@ import type { CacheState } from "../types";
 export const enum DELETE_REASON {
   MANUAL = "manual",
   EXPIRED = "expired",
+  STALE = "stale",
 }
 
 /**
