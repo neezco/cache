@@ -1,10 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 
-import { createCache } from "../src/cache/create-cache";
+import { createCache, resetInstanceCount } from "../src/cache/create-cache";
 import { entries } from "../src/cache/entries";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("entries", () => {
+  beforeEach(() => {
+    resetInstanceCount();
+  });
   it("should return an empty iterator for empty cache", () => {
     const state = createCache();
 

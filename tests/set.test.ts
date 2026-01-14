@@ -1,9 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 
-import { createCache } from "../src/cache/create-cache";
+import { createCache, resetInstanceCount } from "../src/cache/create-cache";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("setOrUpdate", () => {
+  beforeEach(() => {
+    resetInstanceCount();
+  });
+
   const now = Date.now();
 
   it("should set a valid entry", () => {

@@ -2,6 +2,8 @@ import { DELETE_REASON, deleteKey } from "../cache/delete";
 import { isExpired, isStale } from "../cache/validators";
 import type { CacheState } from "../types";
 
+import { calculateOptimalSweepParams } from "./calculate-optimal-sweep-params";
+
 /**
  * Performs a sweep operation on the cache to remove expired and optionally stale entries.
  * Uses a linear scan with a saved pointer to resume from the last processed key.
@@ -22,6 +24,9 @@ export const sweep = async (
     state._sweepIter = state.store.entries();
   }
 
+  // Calculate optimal sweep parameters based on current usage
+  const { sweepIntervalMs, sweepTimeBudgetMs } = calculateOptimalSweepParams(state);
+
   while (true) {
     const next = state._sweepIter.next();
 
@@ -41,7 +46,7 @@ export const sweep = async (
 
     processed++;
 
-    if (Date.now() - startTime > state.sweepTimeBudgetMs) {
+    if (Date.now() - startTime > sweepTimeBudgetMs) {
       break;
     }
 
@@ -54,7 +59,7 @@ export const sweep = async (
   }
 
   // Schedule next sweep
-  schedule(() => void sweep(state, utilities), state.sweepIntervalMs);
+  schedule(() => void sweep(state, utilities), sweepIntervalMs);
 };
 
 const defaultSchedule: scheduleType = (fn, ms) => {

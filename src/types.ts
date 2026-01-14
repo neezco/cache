@@ -45,10 +45,18 @@ export interface CacheConfigBase {
   maxSizeMB: number;
 
   /**
-   * Interval in milliseconds between sweep operations to check for expired keys.
-   * @default 250
+   * Worst-case interval in milliseconds between sweep operations.
+   * @internal
+   * @default 300
    */
-  sweepIntervalMs: number;
+  worstSweepIntervalMs: number;
+
+  /**
+   * Optimus-case interval in milliseconds between sweep operations.
+   * @internal
+   * @default 1000
+   */
+  optimalSweepIntervalMs: number;
 
   /**
    * Number of keys to process in each batch before yielding to the event loop.
@@ -70,12 +78,20 @@ export interface CacheConfigBase {
   sweepExpiredRatio: number;
 
   /**
-   * Maximum amount of time (in milliseconds) that a sweep cycle
+   * Worst-case maximum amount of time (in milliseconds) that a sweep cycle
    * is allowed to run.
-   *
-   * @default 30
+   * @internal
+   * @default 40
    */
-  sweepTimeBudgetMs: number;
+  worstSweepTimeBudgetMs: number;
+
+  /**
+   * Optimus-case maximum amount of time (in milliseconds) that a sweep cycle
+   * is allowed to run.
+   * @internal
+   * @default 10
+   */
+  optimalSweepTimeBudgetMs: number;
 
   /**
    * Controls how stale entries are handled when read from the cache.

@@ -1,10 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 
-import { createCache } from "../src/cache/create-cache";
+import { createCache, resetInstanceCount } from "../src/cache/create-cache";
 import { remainingTTL } from "../src/cache/remaining-ttl";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("remainingTTL", () => {
+  beforeEach(() => {
+    resetInstanceCount();
+  });
+
   const now = Date.now();
 
   it("should return 0 for non-existent key", () => {

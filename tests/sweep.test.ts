@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { createCache } from "../src/cache/create-cache";
+import { createCache, resetInstanceCount } from "../src/cache/create-cache";
 import { setOrUpdate } from "../src/cache/set";
 import { defaultYieldFn, sweep } from "../src/sweep/sweep";
 
 describe("sweep", () => {
   beforeEach(() => {
+    resetInstanceCount();
     vi.useFakeTimers();
   });
 
@@ -79,7 +80,8 @@ describe("sweep", () => {
 
   it("should break sweep when time budget is exceeded", async () => {
     const state = createCache({
-      sweepTimeBudgetMs: -1,
+      worstSweepTimeBudgetMs: -1,
+      optimalSweepTimeBudgetMs: -1,
       autoStartSweep: false,
     });
     const now = Date.now();
@@ -144,7 +146,11 @@ describe("sweep", () => {
       callbacks.push(fn as () => void);
     });
 
-    const state = createCache({ sweepIntervalMs });
+    const state = createCache({
+      worstSweepIntervalMs: sweepIntervalMs,
+      optimalSweepIntervalMs: sweepIntervalMs,
+      autoStartSweep: false,
+    });
 
     await sweep(state, { schedule });
 
@@ -162,7 +168,9 @@ describe("sweep", () => {
 
   it("should not start sweep automatically if autoStartSweep is false", () => {
     const schedule = vi.fn();
-    const state = createCache({ autoStartSweep: false, sweepIntervalMs: 100 });
+    const state = createCache({
+      autoStartSweep: false,
+    });
 
     // Since autoStartSweep is false, sweep should not be called automatically
     expect(schedule).not.toHaveBeenCalled();
