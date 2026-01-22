@@ -5,7 +5,10 @@ import ts from "typescript-eslint";
 // Plugins
 import globals from "globals";
 import importPlugin from "eslint-plugin-import";
+import { readFileSync } from "node:fs";
 // import reactPlugin from "eslint-plugin-react";
+
+const gitignore = readFileSync(".gitignore", "utf8").split("\n").filter(Boolean);
 
 export default [
   /**
@@ -15,6 +18,9 @@ export default [
    */
   {
     ignores: [
+      // Gitignored files and folders
+      ...gitignore,
+
       // Configuration files
       "*.config.{js,ts}",
 

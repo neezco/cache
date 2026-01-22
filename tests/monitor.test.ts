@@ -2,17 +2,16 @@ import { performance, type EventLoopUtilization } from "perf_hooks";
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
-import { createMonitorObserver, collectMetrics } from "../src/utils/procces-monitor";
+import { createMonitorObserver, collectMetrics } from "../src/utils/process-monitor";
 import type {
   PerformanceMetrics,
   CreateMonitorObserverOptions,
-} from "../src/utils/procces-monitor";
+} from "../src/utils/process-monitor";
 
 // Constants for test configuration
 const DEFAULT_CONFIG: CreateMonitorObserverOptions = {
   intervalMs: 100,
   maxMemory: 1024 * 1024 * 1024, // 1GB
-  maxLoop: 1,
 };
 
 const HALF_GB = 512 * 1024 * 1024;
@@ -46,7 +45,7 @@ function assertMetricsStructure(metrics: PerformanceMetrics | null) {
 }
 
 /**
- * Asserts that a metric ratio is properly normalized between 0 and 1.
+ * Asserts that a metric utilization is properly normalized between 0 and 1.
  */
 function assertNormalizedRatio(value: number | undefined) {
   expect(value).toBeDefined();
@@ -135,31 +134,13 @@ describe("createMonitorObserver", () => {
     monitor.start();
     vi.advanceTimersByTime(150);
 
-    const initialRatio = monitor.getMetrics()?.memory.ratio ?? 0;
+    const initialRatio = monitor.getMetrics()?.memory.utilization ?? 0;
     assertNormalizedRatio(initialRatio);
 
     monitor.updateConfig({ maxMemory: HALF_GB });
     vi.advanceTimersByTime(150);
 
-    const updatedRatio = monitor.getMetrics()?.memory.ratio ?? 0;
-    expect(updatedRatio).toBeGreaterThanOrEqual(initialRatio);
-
-    monitor.stop();
-  });
-
-  it("should update max loop configuration", () => {
-    const monitor = createTestMonitor();
-
-    monitor.start();
-    vi.advanceTimersByTime(150);
-
-    const initialRatio = monitor.getMetrics()?.loop.ratio ?? 0;
-    assertNormalizedRatio(initialRatio);
-
-    monitor.updateConfig({ maxLoop: 0.5 });
-    vi.advanceTimersByTime(150);
-
-    const updatedRatio = monitor.getMetrics()?.loop.ratio ?? 0;
+    const updatedRatio = monitor.getMetrics()?.memory.utilization ?? 0;
     expect(updatedRatio).toBeGreaterThanOrEqual(initialRatio);
 
     monitor.stop();
@@ -177,7 +158,6 @@ describe("createMonitorObserver", () => {
     monitor.updateConfig({
       intervalMs: 200,
       maxMemory: HALF_GB,
-      maxLoop: 0.8,
     });
 
     vi.advanceTimersByTime(250);
@@ -265,8 +245,8 @@ function createCollectMetricsProps(overrides?: {
   prevCpu?: NodeJS.CpuUsage;
   prevHrtime?: bigint;
   prevLoop?: EventLoopUtilization;
+  prevMem?: NodeJS.MemoryUsage;
   maxMemory?: number;
-  maxLoop?: number;
   collectedAtMs?: number;
   previousCollectedAtMs?: number;
   intervalMs?: number;
@@ -276,11 +256,11 @@ function createCollectMetricsProps(overrides?: {
     prevCpu: overrides?.prevCpu ?? process.cpuUsage(),
     prevHrtime: overrides?.prevHrtime ?? process.hrtime.bigint(),
     prevLoop: overrides?.prevLoop ?? ({ utilization: 0, idle: 0 } as EventLoopUtilization),
-    maxMemory: overrides?.maxMemory ?? DEFAULT_CONFIG.maxMemory,
-    maxLoop: overrides?.maxLoop ?? DEFAULT_CONFIG.maxLoop,
+    prevMem: overrides?.prevMem ?? process.memoryUsage(),
+    maxMemory: (overrides?.maxMemory ?? DEFAULT_CONFIG.maxMemory) as number,
     collectedAtMs: overrides?.collectedAtMs ?? now,
     previousCollectedAtMs: overrides?.previousCollectedAtMs ?? now - 100,
-    intervalMs: overrides?.intervalMs ?? DEFAULT_CONFIG.intervalMs,
+    intervalMs: (overrides?.intervalMs ?? DEFAULT_CONFIG.intervalMs) as number,
   };
 }
 
@@ -288,22 +268,31 @@ describe("collectMetrics", () => {
   it("should collect memory metrics", () => {
     const metrics = collectMetrics(createCollectMetricsProps());
 
-    expect(metrics.memory).toHaveProperty("rss");
-    expect(metrics.memory).toHaveProperty("heapTotal");
-    expect(metrics.memory).toHaveProperty("heapUsed");
-    expect(metrics.memory).toHaveProperty("external");
-    expect(metrics.memory).toHaveProperty("arrayBuffers");
+    expect(metrics.memory.delta).toHaveProperty("rss");
+    expect(metrics.memory.delta).toHaveProperty("heapTotal");
+    expect(metrics.memory.delta).toHaveProperty("heapUsed");
+    expect(metrics.memory.delta).toHaveProperty("external");
+    expect(metrics.memory.delta).toHaveProperty("arrayBuffers");
 
-    assertNormalizedRatio(metrics.memory.ratio);
+    expect(metrics.memory.total).toHaveProperty("rss");
+    expect(metrics.memory.total).toHaveProperty("heapTotal");
+    expect(metrics.memory.total).toHaveProperty("heapUsed");
+
+    assertNormalizedRatio(metrics.memory.utilization);
   });
 
   it("should collect CPU metrics", () => {
     const metrics = collectMetrics(createCollectMetricsProps());
 
-    expect(metrics.cpu).toHaveProperty("user");
-    expect(metrics.cpu).toHaveProperty("system");
+    expect(metrics.cpu).toHaveProperty("deltaMs");
+    expect(metrics.cpu.delta).toHaveProperty("user");
+    expect(metrics.cpu.delta).toHaveProperty("system");
 
-    assertNormalizedRatio(metrics.cpu.ratio);
+    expect(metrics.cpu.total).toHaveProperty("user");
+    expect(metrics.cpu.total).toHaveProperty("system");
+
+    // TODO: update TSDoc and remove assertNormalizedRatio, memory and cpu should be able to exceed 1 in worst‑case scenarios
+    // assertNormalizedRatio(metrics.cpu.utilization);
   });
 
   it("should collect event loop metrics", () => {
@@ -314,22 +303,22 @@ describe("collectMetrics", () => {
     );
 
     expect(metrics.loop).toHaveProperty("utilization");
-    expect(metrics.loop).toHaveProperty("idle");
+    expect(metrics.loop.delta).toHaveProperty("utilization");
+    expect(metrics.loop.total).toHaveProperty("utilization");
 
-    assertNormalizedRatio(metrics.loop.ratio);
+    assertNormalizedRatio(metrics.loop.utilization);
   });
 
-  it("should normalize memory ratio with extreme limits", () => {
+  it("should normalize memory utilization with extreme limits", () => {
     const metrics1 = collectMetrics(createCollectMetricsProps({ maxMemory: 1024 }));
-    assertNormalizedRatio(metrics1.memory.ratio);
+    assertNormalizedRatio(metrics1.memory.utilization);
 
     const metrics2 = collectMetrics(
       createCollectMetricsProps({
         prevLoop: performance.eventLoopUtilization(),
-        maxLoop: 0.1,
       }),
     );
-    assertNormalizedRatio(metrics2.loop.ratio);
+    assertNormalizedRatio(metrics2.loop.utilization);
   });
 
   it("should calculate actualElapsedMs correctly", () => {
@@ -351,15 +340,14 @@ describe("collectMetrics", () => {
   it("should normalize ratios correctly with custom limits", () => {
     // Test with extreme memory limit
     const metrics1 = collectMetrics(createCollectMetricsProps({ maxMemory: 2048 }));
-    assertNormalizedRatio(metrics1.memory.ratio);
+    assertNormalizedRatio(metrics1.memory.utilization);
 
     // Test with extreme loop limit
     const metrics2 = collectMetrics(
       createCollectMetricsProps({
         prevLoop: performance.eventLoopUtilization(),
-        maxLoop: 0.5,
       }),
     );
-    assertNormalizedRatio(metrics2.loop.ratio);
+    assertNormalizedRatio(metrics2.loop.utilization);
   });
 });

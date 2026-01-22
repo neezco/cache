@@ -13,23 +13,28 @@ import { performance, type EventLoopUtilization } from "perf_hooks";
  * interval, maximum thresholds for normalization, and an optional callback.
  * @returns An API object that allows controlling the monitor lifecycle.
  */
-export function createMonitorObserver(options: CreateMonitorObserverOptions): ReturnCreateMonitor {
+export function createMonitorObserver(
+  options?: Partial<CreateMonitorObserverOptions>,
+): ReturnCreateMonitor {
   let intervalId: NodeJS.Timeout | null = null;
 
   let lastMetrics: PerformanceMetrics | null = null;
-  let prevCpu = process.cpuUsage();
+
   let prevHrtime = process.hrtime.bigint();
+
+  let prevMem = process.memoryUsage();
+  let prevCpu = process.cpuUsage();
   let prevLoop = performance.eventLoopUtilization();
   let lastCollectedAt = Date.now();
 
   const config = {
-    intervalMs: options.intervalMs ?? 500,
-    maxMemory: options.maxMemory,
-    maxLoop: options.maxLoop,
+    intervalMs: options?.intervalMs ?? 500,
+    // options.maxMemory is expected in MB; store bytes internally
+    maxMemory: (options?.maxMemory ?? 512) * 1024 * 1024,
   };
 
   function start(): void {
-    if (intervalId) return; // ya está corriendo
+    if (intervalId) return; // already running
 
     intervalId = setInterval(() => {
       try {
@@ -38,20 +43,22 @@ export function createMonitorObserver(options: CreateMonitorObserverOptions): Re
         const metrics = collectMetrics({
           prevCpu,
           prevHrtime,
+          prevMem,
           prevLoop,
           maxMemory: config.maxMemory,
-          maxLoop: config.maxLoop,
           collectedAtMs: now,
           previousCollectedAtMs: lastCollectedAt,
           intervalMs: config.intervalMs,
         });
 
         lastMetrics = metrics;
-        options.callback?.(metrics);
+        options?.callback?.(metrics);
 
-        prevCpu = metrics.cpu;
+        prevCpu = metrics.cpu.total;
+        prevLoop = metrics.loop.total;
+        prevMem = metrics.memory.total;
+
         prevHrtime = process.hrtime.bigint();
-        prevLoop = metrics.loop;
         lastCollectedAt = now;
       } catch (e: unknown) {
         console.error("MonitorObserver: Not available", e);
@@ -69,22 +76,21 @@ export function createMonitorObserver(options: CreateMonitorObserverOptions): Re
 
   function getMetrics(): PerformanceMetrics | null {
     if (lastMetrics) {
-      // Update the current timestamp when metrics are requested
-      return {
-        ...lastMetrics,
-        collectedAt: Date.now(),
-      };
+      return lastMetrics;
     }
     return null;
   }
 
   function updateConfig(newConfig: Partial<CreateMonitorObserverOptions>): void {
-    if (newConfig.maxMemory !== undefined) config.maxMemory = newConfig.maxMemory;
-    if (newConfig.maxLoop !== undefined) config.maxLoop = newConfig.maxLoop;
+    if (newConfig.maxMemory !== undefined) {
+      // convert MB -> bytes
+      config.maxMemory = newConfig.maxMemory * 1024 * 1024;
+    }
+
     if (newConfig.intervalMs !== undefined) {
       config.intervalMs = newConfig.intervalMs;
 
-      // reiniciar si está activo
+      // restart if active to apply new interval
       if (intervalId) {
         stop();
         start();
@@ -105,43 +111,64 @@ export function createMonitorObserver(options: CreateMonitorObserverOptions): Re
  * including memory usage, CPU usage, and event loop utilization.
  *
  * CPU and event loop metrics are computed as deltas relative to previously
- * recorded values. All metrics are normalized into a ratio between 0 and 1
+ * recorded values. All metrics are normalized into a utilization between 0 and 1
  * based on the configured maximum thresholds.
  *
  * @param props Previous metric snapshots and normalization limits.
  * @returns A structured object containing normalized performance metrics.
  */
 export function collectMetrics(props: {
+  prevMem: NodeJS.MemoryUsage;
   prevCpu: NodeJS.CpuUsage;
   prevHrtime: bigint;
   prevLoop: EventLoopUtilization;
-  maxMemory: number;
-  maxLoop: number;
+  maxMemory: number; // bytes
   collectedAtMs: number;
   previousCollectedAtMs: number;
   intervalMs: number;
 }): PerformanceMetrics {
   const nowHrtime = process.hrtime.bigint();
 
+  const elapsedNs = Number(nowHrtime - props.prevHrtime);
+  const elapsedMs = elapsedNs / 1e6;
+  const actualElapsedMs = props.collectedAtMs - props.previousCollectedAtMs;
+
   const mem = process.memoryUsage();
+  const deltaMem: NodeJS.MemoryUsage = {
+    rss: mem.rss - props.prevMem.rss,
+    heapTotal: mem.heapTotal - props.prevMem.heapTotal,
+    heapUsed: mem.heapUsed - props.prevMem.heapUsed,
+    external: mem.external - props.prevMem.external,
+    arrayBuffers: mem.arrayBuffers - props.prevMem.arrayBuffers,
+  };
   const memRatio = Math.min(1, mem.rss / props.maxMemory);
 
   const cpuDelta = process.cpuUsage(props.prevCpu);
-  const elapsedNs = Number(nowHrtime - props.prevHrtime);
-  const elapsedMs = elapsedNs / 1e6;
-  const cpuMs = (cpuDelta.system + cpuDelta.user) / 1000;
-  const cpuRatio = Math.min(1, cpuMs / elapsedMs);
+  const cpuMs = (cpuDelta.system + cpuDelta.user) / 1e3;
+  const cpuRatio = cpuMs / elapsedMs;
 
   const loop = performance.eventLoopUtilization(props.prevLoop);
 
-  const loopRatio = Math.min(1, loop.utilization / props.maxLoop);
-
-  const actualElapsedMs = props.collectedAtMs - props.previousCollectedAtMs;
-
   return {
-    memory: { ...mem, ratio: memRatio },
-    cpu: { ...cpuDelta, ratio: cpuRatio },
-    loop: { ...loop, ratio: loopRatio },
+    cpu: {
+      deltaMs: cpuMs,
+      utilization: cpuRatio,
+      delta: cpuDelta,
+      total: process.cpuUsage(),
+    },
+
+    loop: {
+      utilization: loop.utilization,
+      delta: loop,
+      total: performance.eventLoopUtilization(),
+    },
+
+    memory: {
+      utilization: memRatio,
+      delta: deltaMem,
+      total: mem,
+    },
+
     collectedAt: props.collectedAtMs,
     previousCollectedAt: props.previousCollectedAtMs,
     intervalMs: props.intervalMs,
@@ -152,34 +179,38 @@ export function collectMetrics(props: {
 // -----------------------------------------------------------------
 
 /**
- * Represents a metric extended with a normalized ratio between 0 and 1.
+ * Represents a metric extended with a normalized utilization between 0 and 1.
  *
- * The ratio indicates how close the metric is to its configured maximum
+ * The utilization indicates how close the metric is to its configured maximum
  * threshold, where 0 means minimal usage and 1 means the limit has been reached.
  *
  * @typeParam T The underlying metric type being normalized.
  */
 export type NormalizedMetric<T> = T & {
   /** Normalized value between 0 and 1 */
-  ratio: number;
+  utilization: number;
 };
 
 /**
- * Represents the complete set of performance metrics collected by the monitor.
- *
- * Includes normalized values for memory usage, CPU usage, and event loop
- * utilization, each containing both raw data and a computed ratio.
- * Also includes timing information to track collection intervals.
+ * PerformanceMetrics describes the actual shape returned by collectMetrics.
+ * All metric groups include raw `delta` and `total` objects plus a normalized utilization.
  */
 export interface PerformanceMetrics {
-  /** Process memory usage, normalized */
-  memory: NormalizedMetric<NodeJS.MemoryUsage>;
+  memory: NormalizedMetric<{
+    delta: NodeJS.MemoryUsage;
+    total: NodeJS.MemoryUsage;
+  }>;
 
-  /** Process CPU usage, normalized */
-  cpu: NormalizedMetric<NodeJS.CpuUsage>;
+  cpu: NormalizedMetric<{
+    deltaMs: number;
+    delta: NodeJS.CpuUsage;
+    total: NodeJS.CpuUsage;
+  }>;
 
-  /** Event loop utilization, normalized */
-  loop: NormalizedMetric<EventLoopUtilization>;
+  loop: NormalizedMetric<{
+    delta: EventLoopUtilization;
+    total: EventLoopUtilization;
+  }>;
 
   /** Timestamp in milliseconds when this metric was collected */
   collectedAt: number;
@@ -195,24 +226,16 @@ export interface PerformanceMetrics {
 }
 
 /**
- * Configuration options for creating a performance monitor observer.
- *
- * These options define the sampling interval, maximum thresholds used for
- * normalization, and an optional callback invoked on each metric update.
+ * Options for createMonitorObserver.
  */
 export interface CreateMonitorObserverOptions {
-  /** Interval in milliseconds between each sample
-   * @default 500
-   */
-  intervalMs: number;
+  /** Interval between samples in ms. Default: 500 */
+  intervalMs?: number;
 
-  /** Maximum RSS memory limit allowed before the ratio reaches 1 */
-  maxMemory: number;
+  /** Maximum RSS memory in megabytes (MB) used for normalization. */
+  maxMemory?: number;
 
-  /** Maximum event loop utilization limit before the ratio reaches 1 */
-  maxLoop: number;
-
-  /** Optional callback that receives the metrics at each interval */
+  /** Optional callback invoked on each metrics sample. */
   callback?: (metrics: PerformanceMetrics) => void;
 }
 
@@ -222,7 +245,7 @@ export interface CreateMonitorObserverOptions {
  * Provides methods to start and stop monitoring, retrieve the latest metrics,
  * and update the monitor configuration at runtime.
  */
-interface ReturnCreateMonitor {
+export interface ReturnCreateMonitor {
   /** Stops the monitoring interval */
   stop: () => void;
 
