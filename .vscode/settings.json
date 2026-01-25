@@ -11,5 +11,87 @@
   "eslint.run": "onType",
   "eslint.workingDirectories": [{ "mode": "auto" }],
 
-  "git.enableCommitSigning": true
+  "git.enableCommitSigning": true,
+
+  // ============================
+  "todo-tree.general.tags": [
+    "TODO",
+    "FIX",
+    "FIXME",
+    "BUG",
+    "REFACTOR",
+    "PENDING",
+    "TEST",
+    "DOC",
+    "NEXT",
+    "INFO",
+    "NOTE",
+    "[]",
+    "[ ]",
+    "[X]",
+    "[x]",
+    "!",
+    "?"
+  ],
+  "todo-tree.general.tagGroups": {
+    "TODO": ["[]", "[ ]"],
+    "INFO": ["INFO", "NOTE", "DOC", "!"],
+    "FIX": ["FIXME", "FIX", "BUG"],
+    "PENDING": ["REFACTOR", "?"],
+    "COMPLETED": [
+      "[X]",
+      "[x]",
+      "CLOSES",
+      "CLOSED",
+      "DONE",
+      "FIXES",
+      "FIXED",
+      "RESOLVED",
+      "RESOLVES"
+    ]
+  },
+  "todo-tree.highlights.defaultHighlight": {
+    "type": "text-and-comment",
+    "foreground": "#e0e0e0",
+    "background": "#acacac1f",
+    "opacity": 100
+  },
+  "todo-tree.highlights.customHighlight": {
+    "INFO": {
+      "icon": "info",
+      "iconColour": "#9b59b6",
+      "foreground": "#9b59b6",
+      "background": "#9b59b620"
+    },
+    "FIX": {
+      "icon": "bug",
+      "iconColour": "#ff453a",
+      "foreground": "#ff453a",
+      "background": "#ff453a20"
+    },
+    "PENDING": {
+      "icon": "tools",
+      "iconColour": "#ffd82b",
+      "foreground": "#ffd82b",
+      "background": "#ffd82b25"
+    },
+    "TEST": {
+      "icon": "beaker",
+      "iconColour": "#e35b20",
+      "foreground": "#e35b20",
+      "background": "#e35b2020"
+    },
+    "NEXT": {
+      "icon": "arrow-right",
+      "iconColour": "#2ecc71",
+      "foreground": "#2ecc71",
+      "background": "#2ecc7120"
+    },
+    "COMPLETED": {
+      "icon": "check",
+      "iconColour": "#2ecc71",
+      "foreground": "#2ecc71",
+      "background": "#2ecc7115"
+    }
+  }
 }

@@ -6,16 +6,18 @@ import ts from "typescript-eslint";
 import globals from "globals";
 import importPlugin from "eslint-plugin-import";
 import { readFileSync } from "node:fs";
+import { defineConfig } from "eslint/config";
 // import reactPlugin from "eslint-plugin-react";
 
 const gitignore = readFileSync(".gitignore", "utf8").split("\n").filter(Boolean);
 
-export default [
+export default defineConfig(
   /**
    * -------------------------------------------------------
    * Files and folders to ignore during linting
    * -------------------------------------------------------
    */
+
   {
     ignores: [
       // Gitignored files and folders
@@ -53,19 +55,17 @@ export default [
    * - Includes type-aware rules via recommendedTypeChecked
    * -------------------------------------------------------
    */
-  ...ts.configs.recommended,
-  ...ts.configs.recommendedTypeChecked,
+
+  ts.configs.recommendedTypeChecked,
 
   /**
    * Enable type-aware linting for TS files
    * (Required for rules that need type information)
    */
   {
-    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parserOptions: {
-        project: "./tsconfig.json",
-        tsconfigRootDir: import.meta.dirname,
+        projectService: true,
       },
     },
   },
@@ -207,4 +207,4 @@ export default [
   //     ...reactPlugin.configs.recommended.rules,
   //   },
   // },
-];
+);
