@@ -43,16 +43,20 @@ export function _sweepOnce(
     if (isExpired(entry, now)) {
       deleteKey(state, key, DELETE_REASON.EXPIRED);
       expiredCount += 1;
-    } else if (isStale(entry, now) && state.purgeStaleOnSweep) {
-      deleteKey(state, key, DELETE_REASON.STALE);
+    } else if (isStale(entry, now)) {
       staleCount += 1;
+
+      if (state.purgeStaleOnSweep) {
+        deleteKey(state, key, DELETE_REASON.STALE);
+      }
     }
   }
 
+  const expiredStaleCount = state.purgeStaleOnSweep ? staleCount : 0;
   return {
     processed,
     expiredCount,
     staleCount,
-    ratio: processed > 0 ? (expiredCount + staleCount) / processed : 0,
+    ratio: processed > 0 ? (expiredCount + expiredStaleCount) / processed : 0,
   };
 }
