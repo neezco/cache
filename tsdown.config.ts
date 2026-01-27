@@ -1,7 +1,5 @@
 import { defineConfig } from "tsdown";
 
-const watchMode = process.env.TSDOWN_WATCH === "true";
-
 export default defineConfig({
   entry: ["src/index.ts"],
   outDir: "dist",
@@ -14,7 +12,7 @@ export default defineConfig({
   // Optimizations
   minify: false,
   sourcemap: true,
-  clean: !watchMode,
+  clean: true,
 
   // External dependencies
   external: [],
@@ -24,5 +22,5 @@ export default defineConfig({
   target: "es2022",
 
   // Watch mode
-  watch: watchMode,
+  // watch: watchMode,
 });
