@@ -1,7 +1,7 @@
 {
   "name": "short-live",
   "type": "module",
-  "module": "./dist/browser/index.js",
+  "module": "./dist/node/index.mjs",
   "main": "./dist/node/index.cjs",
   "types": "./dist/node/index.d.cts",
   "author": {
@@ -20,7 +20,7 @@
   "exports": {
     ".": {
       "require": "./dist/node/index.cjs",
-      "import": "./dist/browser/index.js"
+      "import": "./dist/node/index.mjs"
     },
     "./package.json": "./package.json"
   },

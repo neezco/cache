@@ -1,7 +1,13 @@
-import { OPTIMAL_SWEEP_INTERVAL, WORST_SWEEP_INTERVAL, WORST_SWEEP_TIME_BUDGET } from "../defaults";
+import {
+  DEFAULT_CPU_WEIGHT,
+  DEFAULT_LOOP_WEIGHT,
+  DEFAULT_MEMORY_WEIGHT,
+  OPTIMAL_SWEEP_INTERVAL,
+  WORST_SWEEP_INTERVAL,
+  WORST_SWEEP_TIME_BUDGET,
+} from "../defaults";
 import { interpolate } from "../utils/interpolate";
 import type { PerformanceMetrics } from "../utils/process-monitor";
-import { monitor } from "../utils/start-monitor";
 
 /**
  * Weights for calculating the weighted utilization ratio.
@@ -34,7 +40,7 @@ export interface OptimalSweepParams {
  */
 interface CalculateOptimalSweepParamsOptions {
   /** System performance metrics to base the calculations on. */
-  metrics?: PerformanceMetrics;
+  metrics: PerformanceMetrics;
 
   /** Optional custom weights for each utilization metric. */
   weights?: UtilizationWeights;
@@ -66,20 +72,20 @@ interface CalculateOptimalSweepParamsOptions {
  * @returns Interpolated sweep interval, time budget, and the ratio used.
  */
 export const calculateOptimalSweepParams = (
-  options?: CalculateOptimalSweepParamsOptions,
+  options: CalculateOptimalSweepParamsOptions,
 ): OptimalSweepParams => {
   const {
-    metrics = monitor.getMetrics(),
+    metrics,
     weights = {},
     optimalSweepIntervalMs = OPTIMAL_SWEEP_INTERVAL,
     worstSweepIntervalMs = WORST_SWEEP_INTERVAL,
     worstSweepTimeBudgetMs = WORST_SWEEP_TIME_BUDGET,
-  } = options ?? {};
+  } = options;
 
   // Resolve metric weights (default = 1)
-  const memoryWeight = weights.memory ?? 1;
-  const cpuWeight = weights.cpu ?? 1;
-  const loopWeight = weights.loop ?? 1;
+  const memoryWeight = weights.memory ?? DEFAULT_MEMORY_WEIGHT;
+  const cpuWeight = weights.cpu ?? DEFAULT_CPU_WEIGHT;
+  const loopWeight = weights.loop ?? DEFAULT_LOOP_WEIGHT;
 
   // Memory utilization is used directly (0–1)
   const memoryUtilization = metrics?.memory.utilization ?? 0;

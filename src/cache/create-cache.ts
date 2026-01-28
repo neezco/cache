@@ -1,5 +1,6 @@
 import { sweep } from "../sweep/sweep";
 import type { CacheOptions, CacheState } from "../types";
+import { startMonitor } from "../utils/start-monitor";
 
 let _instanceCount = 0;
 const INSTANCE_WARNING_THRESHOLD = 99;
@@ -73,6 +74,8 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     _initSweepScheduled = true;
     void sweep(state);
   }
+
+  startMonitor();
 
   return state;
 };

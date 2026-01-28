@@ -5,7 +5,7 @@ import {
   OPTIMAL_SWEEP_TIME_BUDGET_IF_NOTE_METRICS_AVAILABLE,
 } from "../defaults";
 import type { CacheState } from "../types";
-import { monitor } from "../utils/start-monitor";
+import { _metrics } from "../utils/start-monitor";
 
 import { _batchUpdateExpiredRatio } from "./batchUpdateExpiredRatio";
 import { calculateOptimalSweepParams } from "./calculate-optimal-sweep-params";
@@ -31,22 +31,10 @@ export const sweep = async (
   } = utilities;
   const startTime = now;
 
-  let metrics = null;
-  try {
-    // Retrieve current system metrics from the monitor
-    metrics = monitor.getMetrics();
-  } catch {
-    // Ignore errors in retrieving metrics
-  }
-
   let sweepIntervalMs = OPTIMAL_SWEEP_INTERVAL;
   let sweepTimeBudgetMs = OPTIMAL_SWEEP_TIME_BUDGET_IF_NOTE_METRICS_AVAILABLE;
-  if (metrics) {
-    try {
-      ({ sweepIntervalMs, sweepTimeBudgetMs } = calculateOptimalSweepParams({ metrics }));
-    } catch {
-      // Ignore errors in calculating optimal sweep params
-    }
+  if (!__BROWSER__ && _metrics) {
+    ({ sweepIntervalMs, sweepTimeBudgetMs } = calculateOptimalSweepParams({ metrics: _metrics }));
   }
 
   const totalSweepWeight = _updateWeightSweep();
