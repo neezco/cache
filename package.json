@@ -1,9 +1,9 @@
 {
   "name": "short-live",
   "type": "module",
-  "module": "./dist/index.mjs",
-  "main": "./dist/index.cjs",
-  "types": "./dist/index.d.cts",
+  "module": "./dist/browser/index.js",
+  "main": "./dist/node/index.cjs",
+  "types": "./dist/node/index.d.cts",
   "author": {
     "name": "Daniel Hernández Ochoa",
     "url": "https://github.com/DanhezCode"
@@ -19,8 +19,8 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "require": "./dist/node/index.cjs",
+      "import": "./dist/browser/index.js"
     },
     "./package.json": "./package.json"
   },

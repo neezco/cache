@@ -1,26 +1,46 @@
 import { defineConfig } from "tsdown";
 
-export default defineConfig({
+// --- Share config ---
+const base = {
   entry: ["src/index.ts"],
-  outDir: "dist",
-
-  // Outputs
-  format: ["esm", "cjs"],
   dts: true,
   exports: true,
-
-  // Optimizations
   minify: false,
   sourcemap: true,
   clean: true,
-
-  // External dependencies
-  external: [],
-
-  // Additional options
   treeshake: true,
   target: "es2022",
+};
 
-  // Watch mode
-  // watch: watchMode,
+const browserConfig = defineConfig({
+  ...base,
+  outDir: "dist/browser",
+  format: ["esm"],
+  platform: "browser",
+  external: ["fs", "v8", "perf_hooks"],
+  treeshake: {
+    moduleSideEffects(id: string, external: boolean) {
+      if (id === "fs" || id === "v8" || id === "perf_hooks") {
+        return false;
+      }
+      return undefined;
+    },
+  },
+
+  define: {
+    __BROWSER__: "true",
+  },
 });
+
+const nodeConfig = defineConfig({
+  ...base,
+  outDir: "dist/node",
+  format: ["esm", "cjs"],
+  platform: "node",
+  external: [],
+  define: {
+    __BROWSER__: "false",
+  },
+});
+
+export default [nodeConfig, browserConfig];

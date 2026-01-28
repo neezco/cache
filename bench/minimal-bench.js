@@ -1,7 +1,7 @@
-import { createCache } from "../dist/index.mjs";
-import { deleteKey } from "../dist/index.mjs";
-import { get } from "../dist/index.mjs";
-import { setOrUpdate } from "../dist/index.mjs";
+import { createCache } from "../dist/node/index.mjs";
+import { deleteKey } from "../dist/node/index.mjs";
+import { get } from "../dist/node/index.mjs";
+import { setOrUpdate } from "../dist/node/index.mjs";
 
 // Función para formatear números con separadores
 const formatNumber = num => {
