@@ -48,4 +48,27 @@ describe("get", () => {
     setOrUpdate(state, { key: "key1", value: "value1", ttl: 100 }, now);
     expect(get(state, "key1", now + 200)).toBe(undefined);
   });
+
+  it("should purges a stale entry when purgeStaleOnGet=true and staleTtl=Infinity", () => {
+    const state = createCache({ purgeStaleOnGet: true });
+
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: Infinity }, now);
+    const firstGet = get(state, "key1", now + 150);
+    expect(firstGet).toBe("value1");
+
+    const secondGet = get(state, "key1", now + 160);
+    expect(secondGet).toBe(undefined);
+  });
+
+  it("should retains a stale entry when purgeStaleOnGet=false and staleTtl=Infinity", () => {
+    // purge stale entries only on sweep
+    const state = createCache({ purgeStaleOnGet: false });
+
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: Infinity }, now);
+    const firstGet = get(state, "key1", now + 150);
+    expect(firstGet).toBe("value1");
+
+    const secondGet = get(state, "key1", now + 160);
+    expect(secondGet).toBe("value1");
+  });
 });

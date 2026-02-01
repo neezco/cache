@@ -53,20 +53,6 @@ describe("setOrUpdate", () => {
     expect(entry![1]).toBe("before");
   });
 
-  it("should throw error if ttl is not finite", () => {
-    const state = createCache();
-    expect(() => setOrUpdate(state, { key: "key1", value: "value1", ttl: NaN })).toThrow(
-      "TTL must be a finite number.",
-    );
-  });
-
-  it("should throw error if staleTtl is not finite", () => {
-    const state = createCache();
-    expect(() =>
-      setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000, staleTtl: Infinity }),
-    ).toThrow("staleTTL must be a finite number.");
-  });
-
   it("should use defaultTtl if not provided in input", () => {
     const state = createCache({ defaultTtl: 2000 });
     setOrUpdate(state, { key: "key1", value: "value1" }, now);

@@ -24,18 +24,10 @@ export const setOrUpdate = (
   const ttl = ttlInput ?? state.defaultTtl;
   const staleTTL = staleTtlInput ?? state.defaultStaleTtl;
 
-  if (!Number.isFinite(ttl)) {
-    throw new Error("TTL must be a finite number.");
-  }
-
-  if (!Number.isFinite(staleTTL)) {
-    throw new Error("staleTTL must be a finite number.");
-  }
-
   const entry: CacheEntry = [
     [
       now, // createdAt
-      ttl > 0 ? now + ttl : 0, // expiresAt
+      ttl > 0 ? now + ttl : Infinity, // expiresAt
       staleTTL > 0 ? now + staleTTL : 0, // staleExpiresAt
     ],
     value,
