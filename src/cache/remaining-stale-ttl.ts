@@ -19,6 +19,6 @@ export const remainingStaleTTL = (
   const entry = state.store.get(key);
   if (!entry || isExpired(entry, now)) return 0;
 
-  const se = entry.se;
-  return Math.max(0, se - now);
+  const staleExpiresAt = entry[0][2];
+  return Math.max(0, staleExpiresAt - now);
 };

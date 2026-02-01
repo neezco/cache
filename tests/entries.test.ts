@@ -25,7 +25,7 @@ describe("entries", () => {
     const result = Array.from(iterator);
 
     expect(result).toHaveLength(2);
-    expect(result.some(([key, entry]) => key === "key1" && entry.v === "value1")).toBe(true);
-    expect(result.some(([key, entry]) => key === "key2" && entry.v === "value2")).toBe(true);
+    expect(result.some(([key, entry]) => key === "key1" && entry[1] === "value1")).toBe(true);
+    expect(result.some(([key, entry]) => key === "key2" && entry[1] === "value2")).toBe(true);
   });
 });

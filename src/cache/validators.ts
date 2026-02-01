@@ -12,7 +12,8 @@ export const isFresh = (
   /** @internal */
   now: number,
 ): boolean => {
-  return now < entry.e;
+  const expiredAt = entry[0][1];
+  return now < expiredAt;
 };
 
 /**
@@ -27,9 +28,10 @@ export const isStale = (
   /** @internal */
   now: number,
 ): boolean => {
-  const staleExpiresAt = entry.se ?? 0;
+  const expiredAt = entry[0][1];
+  const staleExpiresAt = entry[0][2] ?? 0;
 
-  return staleExpiresAt > 0 && now >= entry.e && now < staleExpiresAt;
+  return staleExpiresAt > 0 && now >= expiredAt && now < staleExpiresAt;
 };
 
 /**
@@ -44,9 +46,10 @@ export const isExpired = (
   /** @internal */
   now: number,
 ): boolean => {
-  const staleExpiresAt = entry.se ?? 0;
+  const expiredAt = entry[0][1];
+  const staleExpiresAt = entry[0][2] ?? 0;
 
-  if (staleExpiresAt <= 0) return now >= entry.e;
+  if (staleExpiresAt <= 0) return now >= expiredAt;
 
   return now >= staleExpiresAt;
 };

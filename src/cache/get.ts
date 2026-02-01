@@ -15,13 +15,13 @@ export const get = (state: CacheState, key: string, now: number = Date.now()): u
 
   if (!entry) return undefined;
 
-  if (isFresh(entry, now)) return entry.v;
+  if (isFresh(entry, now)) return entry[1];
 
   if (isStale(entry, now)) {
     if (state.purgeStaleOnGet) {
-      deleteKey(state, key, DELETE_REASON.EXPIRED);
+      deleteKey(state, key, DELETE_REASON.STALE);
     }
-    return entry.v;
+    return entry[1];
   }
 
   // If it expired, always delete it

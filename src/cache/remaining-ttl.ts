@@ -16,5 +16,5 @@ export const remainingTTL = (
 ): number => {
   const entry = state.store.get(key);
   if (!entry) return 0;
-  return Math.max(0, entry.e - now);
+  return Math.max(0, entry[0][1] - now);
 };

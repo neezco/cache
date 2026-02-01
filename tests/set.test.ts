@@ -15,9 +15,9 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 }, now);
     const entry = state.store.get("key1");
     expect(entry).toBeDefined();
-    expect(entry!.v).toBe("value1");
-    expect(entry!.e).toBe(now + 1000);
-    expect(entry!.se).toBe(0);
+    expect(entry![1]).toBe("value1");
+    expect(entry![0][1]).toBe(now + 1000);
+    expect(entry![0][2]).toBe(0);
   });
 
   it("should set entry with staleTtl", () => {
@@ -25,7 +25,7 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000, staleTtl: 2000 }, now);
 
     const entry = state.store.get("key1");
-    expect(entry!.se).toBe(now + 2000);
+    expect(entry![0][2]).toBe(now + 2000);
   });
 
   it("should throw error if key is missing", () => {
@@ -40,7 +40,7 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: null }, now);
 
     const entry = state.store.get("key1");
-    expect(entry!.v).toBe(null);
+    expect(entry![1]).toBe(null);
   });
 
   it("should ignore entry with undefined value", () => {
@@ -50,7 +50,7 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: undefined }, now);
 
     const entry = state.store.get("key1");
-    expect(entry!.v).toBe("before");
+    expect(entry![1]).toBe("before");
   });
 
   it("should throw error if ttl is not finite", () => {
@@ -72,7 +72,7 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: "value1" }, now);
 
     const entry = state.store.get("key1");
-    expect(entry!.e).toBe(now + 2000);
+    expect(entry![0][1]).toBe(now + 2000);
   });
 
   it("should use defaultStaleTtl if staleTtl not provided", () => {
@@ -80,6 +80,6 @@ describe("setOrUpdate", () => {
     setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 }, now);
 
     const entry = state.store.get("key1");
-    expect(entry!.se).toBe(now + 3000);
+    expect(entry![0][2]).toBe(now + 3000);
   });
 });

@@ -5,11 +5,15 @@ import type { CacheEntry } from "../src/types";
 
 describe("validators", () => {
   const now = Date.now();
-  const entry: CacheEntry = {
-    v: "value",
-    e: now + 1000, // expires in 1 second
-    se: now + 2000, // stale expires in 2 seconds
-  };
+  const entry: CacheEntry = [
+    [
+      now,
+      now + 1000, // expires in 1 second
+      now + 2000, // stale expires in 2 seconds]
+    ],
+    "value",
+    null,
+  ];
 
   describe("isFresh", () => {
     it("should return true if now is before expiresAt", () => {
@@ -40,7 +44,7 @@ describe("validators", () => {
     });
 
     it("should return false if staleExpiresAt is 0", () => {
-      const entryNoStale: CacheEntry = { v: "value", e: now + 1000, se: 0 };
+      const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
       expect(isStale(entryNoStale, now + 1500)).toBe(false);
     });
   });
@@ -62,7 +66,7 @@ describe("validators", () => {
     });
 
     it("should return true if now is at or after expiresAt when no staleTTL", () => {
-      const entryNoStale: CacheEntry = { v: "value", e: now + 1000, se: 0 };
+      const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
       expect(isExpired(entryNoStale, now + 1000)).toBe(true);
       expect(isExpired(entryNoStale, now + 1500)).toBe(true);
     });
@@ -90,7 +94,7 @@ describe("validators", () => {
     });
 
     it("should return false for expired entry without staleTTL", () => {
-      const entryNoStale: CacheEntry = { v: "value", e: now + 1000, se: 0 };
+      const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
       expect(isValid(entryNoStale, now + 1000)).toBe(false);
       expect(isValid(entryNoStale, now + 1500)).toBe(false);
     });

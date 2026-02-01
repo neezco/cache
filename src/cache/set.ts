@@ -32,11 +32,15 @@ export const setOrUpdate = (
     throw new Error("staleTTL must be a finite number.");
   }
 
-  const entry: CacheEntry = {
-    v: value,
-    e: now + ttl,
-    se: staleTTL && staleTTL > 0 ? now + staleTTL : 0,
-  };
+  const entry: CacheEntry = [
+    [
+      now, // createdAt
+      ttl > 0 ? now + ttl : 0, // expiresAt
+      staleTTL > 0 ? now + staleTTL : 0, // staleExpiresAt
+    ],
+    value,
+    null,
+  ];
 
   state.store.set(key, entry);
 };
@@ -71,4 +75,6 @@ export interface CacheSetOrUpdateInput {
    * but before stale TTL expires.
    */
   staleTtl?: number;
+
+  tags?: string | string[];
 }

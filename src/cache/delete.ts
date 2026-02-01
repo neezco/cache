@@ -27,7 +27,7 @@ export const deleteKey = (
   if (!entry) return false;
 
   state.store.delete(key);
-  state.onDelete?.(key, entry.v, reason);
+  state.onDelete?.(key, entry[1], reason);
 
   return true;
 };

@@ -79,18 +79,44 @@ export interface CacheConfigBase {
 export type CacheOptions = Partial<CacheConfigBase>;
 
 /**
- * Represents a single cache entry.
+ *  Lifecycle timestamps stored in a Tuple:
+ *  - 0 → createdAt
+ *  - 1 → expiresAt
+ *  - 2 → staleExpiresAt
  */
-export interface CacheEntry {
-  /** The stored value. */
-  v: unknown;
+export type EntryTimestamp = [
+  /** createdAt: Absolute timestamp the entry was created (Date.now()). */
+  number,
 
   /** expiresAt: Absolute timestamp when the entry becomes invalid (Date.now() + TTL). */
-  e: number;
+  number,
 
   /** staleExpiresAt: Absolute timestamp when the entry stops being stale (Date.now() + staleTTL). */
-  se: number;
-}
+  number,
+];
+
+/**
+ * Represents a single cache entry.
+ */
+export type CacheEntry = [
+  EntryTimestamp,
+
+  /** The stored value. */
+  unknown,
+
+  (
+    /**
+     * Optional list of tags associated with this entry.
+     *  Tags can be used for:
+     *  - Group invalidation (e.g., clearing all entries with a given tag)
+     *  - Namespacing or categorization
+     *  - Tracking dependencies
+     *
+     *  If no tags are associated, this field is `null`.
+     */
+    string[] | null
+  ),
+];
 
 /**
  * Internal state of the TTL cache.
