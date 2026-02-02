@@ -26,9 +26,17 @@ export interface CacheConfigBase {
   defaultTtl: number;
 
   /**
-   * Default stale TTL in milliseconds for entries without explicit stale TTL.
+   * Default stale window in milliseconds for entries that do not
+   * specify their own `staleWindowMs`.
+   *
+   * This window determines how long an entry may continue to be
+   * served as stale after it reaches its expiration time.
+   *
+   * The window is always relative to the entry’s own expiration
+   * moment, regardless of whether that expiration comes from an
+   * explicit `ttl` or from the cache’s default TTL.
    */
-  defaultStaleTtl: number;
+  defaultStaleWindow: number;
 
   /**
    * Maximum number of entries the cache can hold.
@@ -139,4 +147,7 @@ export interface CacheState extends CacheConfigBase {
 
   /** Sweep weight for instance, calculate based on size and _expiredRatio */
   _sweepWeight: number;
+
+  /** Map storing tags. */
+  _tags: Map<string, EntryTimestamp>;
 }

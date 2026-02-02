@@ -16,16 +16,19 @@ describe("setOrUpdate", () => {
     const entry = state.store.get("key1");
     expect(entry).toBeDefined();
     expect(entry![1]).toBe("value1");
-    expect(entry![0][1]).toBe(now + 1000);
-    expect(entry![0][2]).toBe(0);
+    expect(entry![0][1]).toBe(now + 1000); // expiresAt
+    expect(entry![0][2]).toBe(0); // staleExpiresAt
   });
 
-  it("should set entry with staleTtl", () => {
+  it("should set entry with staleWindow relative to ttl", () => {
     const state = createCache();
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000, staleTtl: 2000 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000, staleWindow: 2000 }, now);
 
     const entry = state.store.get("key1");
-    expect(entry![0][2]).toBe(now + 2000);
+
+    // expiresAt = now + 1000
+    // staleExpiresAt = expiresAt + 2000 = now + 3000
+    expect(entry![0][2]).toBe(now + 1000 + 2000);
   });
 
   it("should throw error if key is missing", () => {
@@ -61,11 +64,14 @@ describe("setOrUpdate", () => {
     expect(entry![0][1]).toBe(now + 2000);
   });
 
-  it("should use defaultStaleTtl if staleTtl not provided", () => {
-    const state = createCache({ defaultStaleTtl: 3000 });
+  it("should use defaultStaleWindow if staleWindow not provided", () => {
+    const state = createCache({ defaultStaleWindow: 3000 });
     setOrUpdate(state, { key: "key1", value: "value1", ttl: 1000 }, now);
 
     const entry = state.store.get("key1");
-    expect(entry![0][2]).toBe(now + 3000);
+
+    // expiresAt = now + 1000
+    // staleExpiresAt = expiresAt + 3000 = now + 4000
+    expect(entry![0][2]).toBe(now + 1000 + 3000);
   });
 });

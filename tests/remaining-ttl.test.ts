@@ -34,7 +34,7 @@ describe("remainingTTL", () => {
   it("should return remaining TTL for stale entry", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: 200 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: 200 }, now);
     expect(remainingTTL(state, "key1", now + 150)).toBe(0); // TTL expired, but stale
   });
 });

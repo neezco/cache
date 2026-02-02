@@ -29,7 +29,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     defaultTtl = 1000 * 60 * 5, // 5 minutes
     maxSize = 100_000,
     _maxAllowExpiredRatio = DEFAULT_MAX_EXPIRED_RATIO,
-    defaultStaleTtl = 0,
+    defaultStaleWindow = 0,
     purgeStaleOnGet = false,
     purgeStaleOnSweep = false,
     _autoStartSweep = true,
@@ -57,7 +57,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     onDelete,
     maxSize,
     defaultTtl,
-    defaultStaleTtl,
+    defaultStaleWindow,
     purgeStaleOnGet,
     purgeStaleOnSweep,
     _maxAllowExpiredRatio,
@@ -65,6 +65,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     _instanceIndexState: -1,
     _expiredRatio: 0,
     _sweepWeight: 0,
+    _tags: new Map(),
   };
 
   state._instanceIndexState = _instancesCache.push(state) - 1;

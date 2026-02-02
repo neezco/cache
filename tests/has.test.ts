@@ -27,7 +27,7 @@ describe("has", () => {
   it("should return true for stale entry", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: 200 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: 200 }, now);
     expect(has(state, "key1", now + 150)).toBe(true);
   });
 

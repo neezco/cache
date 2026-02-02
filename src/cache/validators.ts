@@ -1,53 +1,53 @@
-import type { CacheEntry } from "../types";
+import type { EntryTimestamp } from "../types";
 
 /**
- * Checks if a cache entry is fresh (not expired and not stale).
- * @param entry - The cache entry.
+ * Checks if a cache entryTimestamp is fresh (not expired and not stale).
+ * @param entryTimestamp - The cache entryTimestamp.
  * @param now - The current timestamp.
- * @returns True if the entry is fresh.
+ * @returns True if the entryTimestamp is fresh.
  */
 export const isFresh = (
-  entry: CacheEntry,
+  entryTimestamp: EntryTimestamp,
 
   /** @internal */
   now: number,
 ): boolean => {
-  const expiredAt = entry[0][1];
+  const expiredAt = entryTimestamp[1];
   return now < expiredAt;
 };
 
 /**
- * Checks if a cache entry is stale (expired but within stale period).
- * @param entry - The cache entry.
+ * Checks if a cache entryTimestamp is stale (expired but within stale period).
+ * @param entryTimestamp - The cache entryTimestamp.
  * @param now - The current timestamp.
- * @returns True if the entry is stale.
+ * @returns True if the entryTimestamp is stale.
  */
 export const isStale = (
-  entry: CacheEntry,
+  entryTimestamp: EntryTimestamp,
 
   /** @internal */
   now: number,
 ): boolean => {
-  const expiredAt = entry[0][1];
-  const staleExpiresAt = entry[0][2] ?? 0;
+  const expiredAt = entryTimestamp[1];
+  const staleExpiresAt = entryTimestamp[2] ?? 0;
 
   return staleExpiresAt > 0 && now >= expiredAt && now < staleExpiresAt;
 };
 
 /**
- * Checks if a cache entry is expired (beyond both TTL and stale TTL).
- * @param entry - The cache entry.
+ * Checks if a cache entryTimestamp is expired (beyond both TTL and stale TTL).
+ * @param entryTimestamp - The cache entryTimestamp.
  * @param now - The current timestamp.
- * @returns True if the entry is expired.
+ * @returns True if the entryTimestamp is expired.
  */
 export const isExpired = (
-  entry: CacheEntry,
+  entryTimestamp: EntryTimestamp,
 
   /** @internal */
   now: number,
 ): boolean => {
-  const expiredAt = entry[0][1];
-  const staleExpiresAt = entry[0][2] ?? 0;
+  const expiredAt = entryTimestamp[1];
+  const staleExpiresAt = entryTimestamp[2] ?? 0;
 
   if (staleExpiresAt <= 0) return now >= expiredAt;
 
@@ -55,13 +55,16 @@ export const isExpired = (
 };
 
 /**
- * Checks if a cache entry is valid (not expired, considering stale period).
- * @param entry - The cache entry, or undefined if not found.
+ * Checks if a cache entryTimestamp is valid (not expired, considering stale period).
+ * @param entryTimestamp - The cache entryTimestamp, or undefined if not found.
  * @param now - Optional timestamp override (defaults to Date.now()).
- * @returns True if the entry exists and is valid, false otherwise.
+ * @returns True if the entryTimestamp exists and is valid, false otherwise.
  */
-export const isValid = (entry?: CacheEntry | null, now: number = Date.now()): boolean => {
-  if (!entry) return false;
+export const isValid = (
+  entryTimestamp?: EntryTimestamp | null,
+  now: number = Date.now(),
+): boolean => {
+  if (!entryTimestamp) return false;
 
-  return isFresh(entry, now) || isStale(entry, now);
+  return isFresh(entryTimestamp, now) || isStale(entryTimestamp, now);
 };

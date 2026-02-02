@@ -1,13 +1,16 @@
 import type { CacheState, CacheEntry } from "../types";
 
 /**
- * Sets or updates a value in the cache with TTL and optional stale TTL.
+ * Sets or updates a value in the cache with TTL and an optional stale window.
  *
  * @param state - The cache state.
- * @param input - Cache entry definition (key, value, ttl, staleMs).
+ * @param input - Cache entry definition (key, value, ttl, staleWindow, tags).
  * @param now - Optional timestamp override used as the base time (defaults to Date.now()).
  *
- * @returns void
+ * @remarks
+ * - `ttl` defines when the entry becomes expired.
+ * - `staleWindow` defines how long the entry may still be served as stale
+ *   after the expiration moment (`now + ttl`).
  */
 export const setOrUpdate = (
   state: CacheState,
@@ -16,22 +19,23 @@ export const setOrUpdate = (
   /** @internal */
   now: number = Date.now(),
 ): void => {
-  const { key, value, ttl: ttlInput, staleTtl: staleTtlInput } = input;
+  const { key, value, ttl: ttlInput, staleWindow: staleWindowInput, tags } = input;
 
   if (value === undefined) return;
   if (key == null) throw new Error("Missing key.");
 
   const ttl = ttlInput ?? state.defaultTtl;
-  const staleTTL = staleTtlInput ?? state.defaultStaleTtl;
+  const staleWindow = staleWindowInput ?? state.defaultStaleWindow;
 
+  const expiresAt = ttl > 0 ? now + ttl : Infinity;
   const entry: CacheEntry = [
     [
       now, // createdAt
-      ttl > 0 ? now + ttl : Infinity, // expiresAt
-      staleTTL > 0 ? now + staleTTL : 0, // staleExpiresAt
+      expiresAt, // expiresAt
+      staleWindow > 0 ? expiresAt + staleWindow : 0, // staleExpiresAt (relative to expiration)
     ],
     value,
-    null,
+    typeof tags === "string" ? [tags] : Array.isArray(tags) ? tags : null,
   ];
 
   state.store.set(key, entry);
@@ -62,11 +66,21 @@ export interface CacheSetOrUpdateInput {
   ttl?: number;
 
   /**
-   * Optional stale TTL in milliseconds for this entry.
-   * When provided, the entry may be served as stale after TTL
-   * but before stale TTL expires.
+   * Optional stale window in milliseconds.
+   *
+   * Defines how long the entry may continue to be served as stale
+   * after it has reached its expiration time.
+   *
+   * The window is always relative to the entry’s own expiration moment,
+   * whether that expiration comes from an explicit `ttl` or from the
+   * cache’s default TTL.
+   *
+   * If omitted, the cache-level default stale window is used.
    */
-  staleTtl?: number;
+  staleWindow?: number;
 
+  /**
+   * Optional tags associated with this entry.
+   */
   tags?: string | string[];
 }

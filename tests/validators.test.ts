@@ -17,58 +17,58 @@ describe("validators", () => {
 
   describe("isFresh", () => {
     it("should return true if now is before expiresAt", () => {
-      expect(isFresh(entry, now)).toBe(true);
-      expect(isFresh(entry, now + 500)).toBe(true);
+      expect(isFresh(entry[0], now)).toBe(true);
+      expect(isFresh(entry[0], now + 500)).toBe(true);
     });
 
     it("should return false if now is at or after expiresAt", () => {
-      expect(isFresh(entry, now + 1000)).toBe(false);
-      expect(isFresh(entry, now + 1500)).toBe(false);
+      expect(isFresh(entry[0], now + 1000)).toBe(false);
+      expect(isFresh(entry[0], now + 1500)).toBe(false);
     });
   });
 
   describe("isStale", () => {
     it("should return false if now is before expiresAt", () => {
-      expect(isStale(entry, now)).toBe(false);
-      expect(isStale(entry, now + 500)).toBe(false);
+      expect(isStale(entry[0], now)).toBe(false);
+      expect(isStale(entry[0], now + 500)).toBe(false);
     });
 
     it("should return true if now is between expiresAt and staleExpiresAt", () => {
-      expect(isStale(entry, now + 1000)).toBe(true);
-      expect(isStale(entry, now + 1500)).toBe(true);
+      expect(isStale(entry[0], now + 1000)).toBe(true);
+      expect(isStale(entry[0], now + 1500)).toBe(true);
     });
 
     it("should return false if now is at or after staleExpiresAt", () => {
-      expect(isStale(entry, now + 2000)).toBe(false);
-      expect(isStale(entry, now + 2500)).toBe(false);
+      expect(isStale(entry[0], now + 2000)).toBe(false);
+      expect(isStale(entry[0], now + 2500)).toBe(false);
     });
 
     it("should return false if staleExpiresAt is 0", () => {
       const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
-      expect(isStale(entryNoStale, now + 1500)).toBe(false);
+      expect(isStale(entryNoStale[0], now + 1500)).toBe(false);
     });
   });
 
   describe("isExpired", () => {
     it("should return false if now is before expiresAt", () => {
-      expect(isExpired(entry, now)).toBe(false);
-      expect(isExpired(entry, now + 500)).toBe(false);
+      expect(isExpired(entry[0], now)).toBe(false);
+      expect(isExpired(entry[0], now + 500)).toBe(false);
     });
 
     it("should return false if now is between expiresAt and staleExpiresAt", () => {
-      expect(isExpired(entry, now + 1000)).toBe(false);
-      expect(isExpired(entry, now + 1500)).toBe(false);
+      expect(isExpired(entry[0], now + 1000)).toBe(false);
+      expect(isExpired(entry[0], now + 1500)).toBe(false);
     });
 
     it("should return true if now is at or after staleExpiresAt", () => {
-      expect(isExpired(entry, now + 2000)).toBe(true);
-      expect(isExpired(entry, now + 2500)).toBe(true);
+      expect(isExpired(entry[0], now + 2000)).toBe(true);
+      expect(isExpired(entry[0], now + 2500)).toBe(true);
     });
 
     it("should return true if now is at or after expiresAt when no staleTTL", () => {
       const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
-      expect(isExpired(entryNoStale, now + 1000)).toBe(true);
-      expect(isExpired(entryNoStale, now + 1500)).toBe(true);
+      expect(isExpired(entryNoStale[0], now + 1000)).toBe(true);
+      expect(isExpired(entryNoStale[0], now + 1500)).toBe(true);
     });
   });
 
@@ -79,24 +79,24 @@ describe("validators", () => {
     });
 
     it("should return true for fresh entry", () => {
-      expect(isValid(entry, now)).toBe(true);
-      expect(isValid(entry, now + 500)).toBe(true);
+      expect(isValid(entry[0], now)).toBe(true);
+      expect(isValid(entry[0], now + 500)).toBe(true);
     });
 
     it("should return true for stale entry", () => {
-      expect(isValid(entry, now + 1000)).toBe(true);
-      expect(isValid(entry, now + 1500)).toBe(true);
+      expect(isValid(entry[0], now + 1000)).toBe(true);
+      expect(isValid(entry[0], now + 1500)).toBe(true);
     });
 
     it("should return false for expired entry", () => {
-      expect(isValid(entry, now + 2000)).toBe(false);
-      expect(isValid(entry, now + 2500)).toBe(false);
+      expect(isValid(entry[0], now + 2000)).toBe(false);
+      expect(isValid(entry[0], now + 2500)).toBe(false);
     });
 
     it("should return false for expired entry without staleTTL", () => {
       const entryNoStale: CacheEntry = [[now, now + 1000, 0], "value", null];
-      expect(isValid(entryNoStale, now + 1000)).toBe(false);
-      expect(isValid(entryNoStale, now + 1500)).toBe(false);
+      expect(isValid(entryNoStale[0], now + 1000)).toBe(false);
+      expect(isValid(entryNoStale[0], now + 1500)).toBe(false);
     });
   });
 });

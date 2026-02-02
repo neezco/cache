@@ -47,7 +47,7 @@ const runHeavyLoadTests = async () => {
       name: "TTL corto sin stale",
       options: {
         defaultTtl: 1000,
-        defaultStaleTtl: 0,
+        defaultStaleWindow: 0,
         purgeStaleOnGet: false,
         purgeStaleOnSweep: false,
       },
@@ -57,7 +57,7 @@ const runHeavyLoadTests = async () => {
       name: "TTL largo con stale, purge on get",
       options: {
         defaultTtl: 5000,
-        defaultStaleTtl: 10000,
+        defaultStaleWindow: 5000,
         purgeStaleOnGet: true,
         purgeStaleOnSweep: false,
       },
@@ -67,7 +67,7 @@ const runHeavyLoadTests = async () => {
       name: "TTL largo con stale, purge on sweep",
       options: {
         defaultTtl: 5000,
-        defaultStaleTtl: 8000,
+        defaultStaleWindow: 3000,
         purgeStaleOnGet: false,
         purgeStaleOnSweep: true,
       },
@@ -77,7 +77,7 @@ const runHeavyLoadTests = async () => {
       name: "Carga extrema: 10M entradas",
       options: {
         defaultTtl: 15000,
-        defaultStaleTtl: 20000,
+        defaultStaleWindow: 5000,
         purgeStaleOnGet: false,
         purgeStaleOnSweep: false,
       },
@@ -89,7 +89,7 @@ const runHeavyLoadTests = async () => {
     logProgress(`Ejecutando escenario ${index + 1}/${scenarios.length}: ${scenario.name}`, "🔄");
     logResult(
       "Configuración",
-      `TTL: ${formatNumber(scenario.options.defaultTtl)} ms, StaleTTL: ${formatNumber(scenario.options.defaultStaleTtl)} ms`,
+      `TTL: ${formatNumber(scenario.options.defaultTtl)} ms, StaleWindow: ${formatNumber(scenario.options.defaultStaleWindow)} ms`,
       "⚙️",
     );
 
@@ -124,11 +124,10 @@ const runHeavyLoadTests = async () => {
     logResult("Tamaño del cache después de delete", formatNumber(cache.store.size), "📊");
 
     // Esperar tiempo suficiente para expiraciones y monitorear sweeper
-    const waitTime = scenario.options.defaultStaleTtl
-      ? scenario.options.defaultStaleTtl * 1.5
-      : scenario.options.defaultTtl
-        ? scenario.options.defaultTtl * 1.5
-        : 2000;
+    const ttl = scenario.options.defaultTtl ?? 0;
+    const stale = scenario.options.defaultStaleWindow ?? 0;
+
+    const waitTime = (ttl + stale) * 1.5 || 2000;
 
     logProgress(
       `Esperando ${formatTime(waitTime)} para expiración y monitoreando sweeper...`,

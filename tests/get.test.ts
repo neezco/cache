@@ -27,14 +27,14 @@ describe("get", () => {
   it("should return value for stale entry", () => {
     const state = createCache();
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: 200 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: 200 }, now);
     expect(get(state, "key1", now + 150)).toBe("value1");
   });
 
   it("should purge stale entry if purgeStaleOnGet is set to true", () => {
     const state = createCache({ purgeStaleOnGet: true });
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: 200 }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: 200 }, now);
     const firstGet = get(state, "key1", now + 150);
     expect(firstGet).toBe("value1");
 
@@ -49,10 +49,10 @@ describe("get", () => {
     expect(get(state, "key1", now + 200)).toBe(undefined);
   });
 
-  it("should purges a stale entry when purgeStaleOnGet=true and staleTtl=Infinity", () => {
+  it("should purges a stale entry when purgeStaleOnGet=true and staleWindow=Infinity", () => {
     const state = createCache({ purgeStaleOnGet: true });
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: Infinity }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: Infinity }, now);
     const firstGet = get(state, "key1", now + 150);
     expect(firstGet).toBe("value1");
 
@@ -60,11 +60,11 @@ describe("get", () => {
     expect(secondGet).toBe(undefined);
   });
 
-  it("should retains a stale entry when purgeStaleOnGet=false and staleTtl=Infinity", () => {
+  it("should retains a stale entry when purgeStaleOnGet=false and staleWindow=Infinity", () => {
     // purge stale entries only on sweep
     const state = createCache({ purgeStaleOnGet: false });
 
-    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleTtl: Infinity }, now);
+    setOrUpdate(state, { key: "key1", value: "value1", ttl: 100, staleWindow: Infinity }, now);
     const firstGet = get(state, "key1", now + 150);
     expect(firstGet).toBe("value1");
 
