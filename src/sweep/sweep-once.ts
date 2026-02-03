@@ -1,8 +1,7 @@
 import { DELETE_REASON, deleteKey } from "../cache/delete";
 import { isExpired, isStale } from "../cache/validators";
 import { MAX_KEYS_PER_BATCH } from "../defaults";
-import type { CacheState } from "../types";
-import { _mergeTimestamps } from "../utils/merge-timestamps";
+import { type CacheState } from "../types";
 
 /**
  * Performs a single sweep operation on the cache to remove expired and optionally stale entries.
@@ -41,11 +40,10 @@ export function _sweepOnce(
 
     const now = Date.now();
 
-    const mergedTimestamps = _mergeTimestamps(state, entry);
-    if (isExpired(mergedTimestamps, now)) {
+    if (isExpired(state, entry, now)) {
       deleteKey(state, key, DELETE_REASON.EXPIRED);
       expiredCount += 1;
-    } else if (isStale(mergedTimestamps, now)) {
+    } else if (isStale(state, entry, now)) {
       staleCount += 1;
 
       if (state.purgeStaleOnSweep) {

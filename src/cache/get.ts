@@ -1,5 +1,4 @@
 import type { CacheState } from "../types";
-import { _mergeTimestamps } from "../utils/merge-timestamps";
 
 import { DELETE_REASON, deleteKey } from "./delete";
 import { isFresh, isStale } from "./validators";
@@ -16,11 +15,9 @@ export const get = (state: CacheState, key: string, now: number = Date.now()): u
 
   if (!entry) return undefined;
 
-  const mergedTimestamps = _mergeTimestamps(state, entry);
+  if (isFresh(state, entry, now)) return entry[1];
 
-  if (isFresh(mergedTimestamps, now)) return entry[1];
-
-  if (isStale(mergedTimestamps, now)) {
+  if (isStale(state, entry, now)) {
     if (state.purgeStaleOnGet) {
       deleteKey(state, key, DELETE_REASON.STALE);
     }

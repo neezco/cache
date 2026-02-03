@@ -127,6 +127,18 @@ export type CacheEntry = [
 ];
 
 /**
+ * Status of a cache entry.
+ */
+export enum ENTRY_STATUS {
+  /** The entry is fresh and valid. */
+  FRESH = "fresh",
+  /** The entry is stale but can still be served. */
+  STALE = "stale",
+  /** The entry has expired and is no longer valid. */
+  EXPIRED = "expired",
+}
+
+/**
  * Internal state of the TTL cache.
  */
 export interface CacheState extends CacheConfigBase {
@@ -148,6 +160,13 @@ export interface CacheState extends CacheConfigBase {
   /** Sweep weight for instance, calculate based on size and _expiredRatio */
   _sweepWeight: number;
 
-  /** Map storing tags. */
-  _tags: Map<string, EntryTimestamp>;
+  /**
+   * Tag invalidation state.
+   * Each tag stores:
+   * - 0 → moment when the tag was marked as expired (0 if never)
+   * - 1 → moment when the tag was marked as stale (0 if never)
+   *
+   * These timestamps define whether a tag affects an entry based on
+   * the entry's creation time. */
+  _tags: Map<string, [number, number]>;
 }

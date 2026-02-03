@@ -133,10 +133,10 @@ export default defineConfig(
       // Disable base rule and use TS version instead
       "no-unused-vars": "off",
 
-      // Allow unused variables prefixed with "_"
+      // Allow unused variables prefixed with "__"
       "@typescript-eslint/no-unused-vars": [
         "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+        { argsIgnorePattern: "^__", varsIgnorePattern: "^__" },
       ],
 
       // Allow console.warn and console.error only
