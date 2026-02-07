@@ -1,4 +1,4 @@
-import { ENTRY_STATUS, type CacheEntry, type CacheState } from "./types";
+import { ENTRY_STATUS, type CacheEntry, type CacheState } from "../types";
 
 /**
  * Computes the derived status of a cache entry based on its associated tags.

@@ -1,5 +1,5 @@
-import { _statusFromTags } from "../status-from-tags";
 import { ENTRY_STATUS, type CacheEntry, type CacheState } from "../types";
+import { _statusFromTags } from "../utils/status-from-tags";
 
 /**
  * Computes the final derived status of a cache entry by combining:
