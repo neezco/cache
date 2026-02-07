@@ -1,4 +1,9 @@
-import { DEFAULT_MAX_EXPIRED_RATIO } from "../defaults";
+import {
+  DEFAULT_MAX_EXPIRED_RATIO,
+  DEFAULT_MAX_SIZE,
+  DEFAULT_STALE_WINDOW,
+  DEFAULT_TTL,
+} from "../defaults";
 import { sweep } from "../sweep/sweep";
 import type { CacheOptions, CacheState } from "../types";
 import { startMonitor } from "../utils/start-monitor";
@@ -26,10 +31,10 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
   const {
     onExpire,
     onDelete,
-    defaultTtl = 1000 * 60 * 5, // 5 minutes
-    maxSize = 100_000,
+    defaultTtl = DEFAULT_TTL,
+    maxSize = DEFAULT_MAX_SIZE,
     _maxAllowExpiredRatio = DEFAULT_MAX_EXPIRED_RATIO,
-    defaultStaleWindow = 0,
+    defaultStaleWindow = DEFAULT_STALE_WINDOW,
     purgeStaleOnGet = false,
     purgeStaleOnSweep = false,
     _autoStartSweep = true,
@@ -43,7 +48,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     // NEXT: Use a proper logging mechanism
     // NEXT: Create documentation for this
     console.warn(
-      `Too many instances detected (${_instanceCount}). This may indicate a configuration issue; consider minimizing instance creation or grouping keys by expected expiration ranges. See the documentation: https://github.com/neezco/short-live/docs/instances`,
+      `Too many instances detected (${_instanceCount}). This may indicate a configuration issue; consider minimizing instance creation or grouping keys by expected expiration ranges. See the documentation: https://github.com/neezco/cache/docs/getting-started.md`,
     );
   }
 

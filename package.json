@@ -1,5 +1,5 @@
 {
-  "name": "short-live",
+  "name": "@neezco/cache",
   "type": "module",
   "module": "./dist/browser/index.js",
   "main": "./dist/node/index.cjs",
@@ -9,13 +9,13 @@
     "url": "https://github.com/DanhezCode"
   },
   "license": "MIT",
-  "homepage": "https://github.com/neezco/short-live#readme",
+  "homepage": "https://github.com/neezco/cache#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neezco/short-live.git"
+    "url": "git+https://github.com/neezco/cache.git"
   },
   "bugs": {
-    "url": "https://github.com/neezco/short-live/issues"
+    "url": "https://github.com/neezco/cache/issues"
   },
   "exports": {
     ".": {
@@ -37,6 +37,7 @@
     "format:prettier": "prettier --write .",
     "format:all": "pnpm lint:fix && pnpm format:prettier",
     "check": "concurrently \"pnpm format:all\" \"pnpm typecheck\"",
+    "check:all": "concurrently \"pnpm format:all\" \"pnpm typecheck\" \"pnpm test\"",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage",

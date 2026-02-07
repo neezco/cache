@@ -21,7 +21,7 @@ export interface CacheConfigBase {
 
   /**
    * Default TTL (Time-To-Live) in milliseconds for entries without explicit TTL.
-   * @default 300_000 (5 minutes)
+   * @default 1_800_000 (30 minutes)
    */
   defaultTtl: number;
 
@@ -35,14 +35,16 @@ export interface CacheConfigBase {
    * The window is always relative to the entry’s own expiration
    * moment, regardless of whether that expiration comes from an
    * explicit `ttl` or from the cache’s default TTL.
+   * @default null (No stale window)
    */
   defaultStaleWindow: number;
 
   /**
    * Maximum number of entries the cache can hold.
-   * @default 100_000
+   * Beyond this limit, new entries are ignored.
+   * @default null (unlimited)
    */
-  maxSize: number;
+  maxSize?: number;
 
   /**
    * Controls how stale entries are handled when read from the cache.
