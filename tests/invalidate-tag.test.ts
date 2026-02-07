@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
-import { createCache, _resetInstanceCount } from "../src/cache/create-cache";
+import { createCache } from "../src/cache/create-cache";
 import { get } from "../src/cache/get";
 import { invalidateTag } from "../src/cache/invalidate-tag";
 import { setOrUpdate } from "../src/cache/set";
@@ -8,9 +8,6 @@ import { isExpired, isStale, isFresh } from "../src/cache/validators";
 
 describe("invalidateTag behavior", () => {
   const now = Date.now();
-  beforeEach(() => {
-    _resetInstanceCount();
-  });
 
   it("marks entries as expired when a tag is invalidated (and get deletes them)", () => {
     const state = createCache();

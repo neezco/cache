@@ -1,14 +1,10 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 
-import { createCache, _resetInstanceCount } from "../src/cache/create-cache";
+import { createCache } from "../src/cache/create-cache";
 import { has } from "../src/cache/has";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("has", () => {
-  beforeEach(() => {
-    _resetInstanceCount();
-  });
-
   const now = Date.now();
 
   it("should return false for non-existent key", () => {

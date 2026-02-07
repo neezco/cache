@@ -1,14 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import { clear } from "../src/cache/clear";
-import { createCache, _resetInstanceCount } from "../src/cache/create-cache";
+import { createCache } from "../src/cache/create-cache";
 import { setOrUpdate } from "../src/cache/set";
 
 describe("clear", () => {
-  beforeEach(() => {
-    _resetInstanceCount();
-  });
-
   it("should clear empty cache without errors", () => {
     const state = createCache();
     expect(() => clear(state)).not.toThrow();
