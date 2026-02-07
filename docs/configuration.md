@@ -109,13 +109,13 @@ Short-Live supports callbacks for monitoring cache operations:
 
 #### `onExpire(key, value)`
 
-// NEXT check this, missing reason and maybe incomplete
 Called when an entry expires naturally (reaches its TTL).
 
 ```javascript
 const cache = new LocalTtlCache({
-  onExpire: (key, value) => {
-    console.log(`Entry expired: ${key}`, value);
+  onExpire: (key, value, reason) => {
+    // reason can be: 'expired', or 'stale'
+    console.log(`Entry expired: ${key} (${reason})`, value);
   },
 });
 

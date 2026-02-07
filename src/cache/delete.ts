@@ -18,8 +18,9 @@ export const deleteKey = (
   reason: DELETE_REASON = DELETE_REASON.MANUAL,
 ): boolean => {
   const onDelete = state.onDelete;
+  const onExpire = state.onExpire;
 
-  if (!onDelete) {
+  if (!onDelete && !onExpire) {
     return state.store.delete(key);
   }
 
@@ -28,6 +29,9 @@ export const deleteKey = (
 
   state.store.delete(key);
   state.onDelete?.(key, entry[1], reason);
+  if (reason !== DELETE_REASON.MANUAL) {
+    state.onExpire?.(key, entry[1], reason);
+  }
 
   return true;
 };

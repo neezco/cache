@@ -8,8 +8,13 @@ export interface CacheConfigBase {
    * Callback invoked when a key expires naturally.
    * @param key - The expired key.
    * @param value - The value associated with the expired key.
+   * @param reason - The reason for deletion ('expired', or 'stale').
    */
-  onExpire?: (key: string, value: unknown) => void;
+  onExpire?: (
+    key: string,
+    value: unknown,
+    reason: Exclude<DELETE_REASON, DELETE_REASON.MANUAL>,
+  ) => void;
 
   /**
    * Callback invoked when a key is deleted, either manually or due to expiration.
