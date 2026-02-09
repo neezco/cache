@@ -1,5 +1,6 @@
 import {
   DEFAULT_MAX_EXPIRED_RATIO,
+  DEFAULT_MAX_MEMORY_SIZE,
   DEFAULT_MAX_SIZE,
   DEFAULT_STALE_WINDOW,
   DEFAULT_TTL,
@@ -33,6 +34,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     onDelete,
     defaultTtl = DEFAULT_TTL,
     maxSize = DEFAULT_MAX_SIZE,
+    maxMemorySize = DEFAULT_MAX_MEMORY_SIZE,
     _maxAllowExpiredRatio = DEFAULT_MAX_EXPIRED_RATIO,
     defaultStaleWindow = DEFAULT_STALE_WINDOW,
     purgeStaleOnGet = false,
@@ -61,6 +63,7 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
     onExpire,
     onDelete,
     maxSize,
+    maxMemorySize,
     defaultTtl,
     defaultStaleWindow,
     purgeStaleOnGet,

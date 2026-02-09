@@ -24,9 +24,16 @@ export const DEFAULT_STALE_WINDOW: number = 0 as const;
 
 /**
  * Maximum number of entries the cache can hold.
- * Beyond this limit, less-used entries are evicted.
+ * Beyond this limit, new entries are ignored.
  */
 export const DEFAULT_MAX_SIZE: number = Infinity;
+
+/**
+ * Default maximum memory size in MB the cache can use.
+ * Beyond this limit, new entries are ignored.
+ * @default Infinite (unlimited)
+ */
+export const DEFAULT_MAX_MEMORY_SIZE: number = Infinity;
 
 /**
  * ===================================================================

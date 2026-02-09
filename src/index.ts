@@ -100,14 +100,19 @@ export class LocalTtlCache {
    * @param options.ttl - Time-To-Live in milliseconds. Defaults to `defaultTtl`
    * @param options.staleWindow - How long to serve stale data after expiration (milliseconds)
    * @param options.tags - One or more tags for group invalidation
+   * @returns True if the entry was set or updated, false if rejected due to limits or invalid input
    *
    * @example
    * ```typescript
-   * cache.set("user:123", { name: "Alice" }, {
+   * const success = cache.set("user:123", { name: "Alice" }, {
    *   ttl: 5 * 60 * 1000,
    *   staleWindow: 1 * 60 * 1000,
    *   tags: "user:123",
    * });
+   *
+   * if (!success) {
+   *   console.log("Entry was rejected due to size or memory limits");
+   * }
    * ```
    *
    * @edge-cases
@@ -115,6 +120,10 @@ export class LocalTtlCache {
    * - If `ttl` is 0 or Infinite, the entry never expires
    * - If `staleWindow` is larger than `ttl`, the entry can be served as stale longer than it was fresh
    * - Tags are optional; only necessary for group invalidation via `invalidateTag()`
+   * - Returns `false` if value is `undefined` (existing value remains untouched)
+   * - Returns `false` if new key would exceed [`maxSize`](./docs/configuration.md#maxsize-number) limit
+   * - Returns `false` if new key would exceed [`maxMemorySize`](./docs/configuration.md#maxmemorysize-number) limit
+   * - Updating existing keys always succeeds, even at limit
    */
   set(
     key: string,
@@ -124,8 +133,8 @@ export class LocalTtlCache {
       staleWindow?: number;
       tags?: string | string[];
     },
-  ): void {
-    setOrUpdate(this.state, {
+  ): boolean {
+    return setOrUpdate(this.state, {
       key,
       value,
       ttl: options?.ttl,

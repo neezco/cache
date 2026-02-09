@@ -49,7 +49,7 @@ cache.set("data", { value: "old" });
 
 ### `maxSize` (number)
 
-The maximum number of entries the cache can hold. When the limit is reached, the cache automatically cleans up expired entries and removes less-used items.
+The maximum number of entries the cache can hold. When the limit is reached, new entries are ignored while existing keys can still be updated.
 
 - **Type**: `number`
 - **Default**: `Infinite` (no limit)
@@ -60,8 +60,45 @@ const cache = new LocalTtlCache({
   maxSize: 10_000, // Only keep up to 10,000 items
 });
 
-// When you exceed 10_000 items new entries are ignored
+cache.set("key1", "value1"); // OK - within limit
+cache.set("key10001", "value"); // Ignored - would exceed maxSize
+cache.set("key1", "updated"); // OK - updating existing key is always allowed
 ```
+
+**Edge Cases:**
+
+- New entries are rejected silently when maxSize is reached
+- Updating existing keys is **always allowed**, regardless of maxSize limit
+- Value set to `Infinity` or `0` means unlimited entries
+
+---
+
+### `maxMemorySize` (number)
+
+The maximum memory size in MB the cache can consume. When the limit is reached, new entries are ignored while existing keys can still be updated.
+
+- **Type**: `number` (in megabytes)
+- **Default**: `Infinite` (no limit)
+- **Example**: `maxMemorySize: 512` (512 MB)
+- **Note**: Only enforced in Node.js environments (browser environments ignore this setting)
+
+```javascript
+const cache = new LocalTtlCache({
+  maxMemorySize: 512, // Cache uses at most 512 MB
+});
+
+cache.set("key1", largeObject); // OK - within memory limit
+cache.set("key2", anotherLargeObject); // May be ignored if total memory would exceed 512 MB
+cache.set("key1", "updated"); // OK - updating existing key is allowed
+```
+
+**Edge Cases:**
+
+- New entries are rejected silently when memory limit is reached
+- Updating existing keys is **always allowed**, regardless of memory limit
+- Measured via Node.js `process.memoryUsage().rss`
+- Value set to `Infinity` or `0` means unlimited memory
+- **Not supported in browser environments** — this setting is ignored when running in a browser
 
 ### `purgeStaleOnGet` (boolean)
 
@@ -83,6 +120,8 @@ cache.set("data", "value");
 // When you call cache.get("data"), it returns the stale value AND deletes it
 // Subsequent calls return undefined
 ```
+
+---
 
 ### `purgeStaleOnSweep` (boolean)
 

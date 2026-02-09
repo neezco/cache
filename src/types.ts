@@ -47,9 +47,16 @@ export interface CacheConfigBase {
   /**
    * Maximum number of entries the cache can hold.
    * Beyond this limit, new entries are ignored.
-   * @default null (unlimited)
+   * @default Infinite (unlimited)
    */
-  maxSize?: number;
+  maxSize: number;
+
+  /**
+   * Maximum memory size in MB the cache can use.
+   * Beyond this limit, new entries are ignored.
+   * @default Infinite (unlimited)
+   */
+  maxMemorySize: number;
 
   /**
    * Controls how stale entries are handled when read from the cache.

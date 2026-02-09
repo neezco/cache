@@ -1,4 +1,5 @@
 import type { CacheState, CacheEntry } from "../types";
+import { _metrics } from "../utils/start-monitor";
 
 /**
  * Sets or updates a value in the cache with TTL and an optional stale window.
@@ -6,11 +7,16 @@ import type { CacheState, CacheEntry } from "../types";
  * @param state - The cache state.
  * @param input - Cache entry definition (key, value, ttl, staleWindow, tags).
  * @param now - Optional timestamp override used as the base time (defaults to Date.now()).
+ * @returns True if the entry was created or updated, false if rejected due to limits or invalid input.
  *
  * @remarks
  * - `ttl` defines when the entry becomes expired.
  * - `staleWindow` defines how long the entry may still be served as stale
  *   after the expiration moment (`now + ttl`).
+ * - Returns false if value is `undefined` (entry ignored, existing value untouched).
+ * - Returns false if new entry would exceed `maxSize` limit (existing keys always allowed).
+ * - Returns false if new entry would exceed `maxMemorySize` limit (existing keys always allowed).
+ * - Returns true if entry was set or updated (or if existing key was updated at limit).
  */
 export const setOrUpdate = (
   state: CacheState,
@@ -18,11 +24,24 @@ export const setOrUpdate = (
 
   /** @internal */
   now: number = Date.now(),
-): void => {
+): boolean => {
   const { key, value, ttl: ttlInput, staleWindow: staleWindowInput, tags } = input;
 
-  if (value === undefined) return;
+  if (value === undefined) return false; // Ignore undefined values, leaving existing entry intact if it exists
   if (key == null) throw new Error("Missing key.");
+  if (state.size >= state.maxSize && !state.store.has(key)) {
+    // Ignore new entries when max size is reached, but allow updates to existing keys
+    return false;
+  }
+  if (
+    !__BROWSER__ &&
+    _metrics?.memory.total.rss &&
+    _metrics?.memory.total.rss >= state.maxMemorySize * 1024 * 1024 &&
+    !state.store.has(key)
+  ) {
+    // Ignore new entries when max memory size is reached, but allow updates to existing keys
+    return false;
+  }
 
   const ttl = ttlInput ?? state.defaultTtl;
   const staleWindow = staleWindowInput ?? state.defaultStaleWindow;
@@ -39,6 +58,7 @@ export const setOrUpdate = (
   ];
 
   state.store.set(key, entry);
+  return true;
 };
 
 /**

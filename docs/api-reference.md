@@ -14,7 +14,13 @@ Creates a new cache instance.
 
 **Parameters:**
 
-- `options` (optional) - Configuration object. See [Configuration Guide](./configuration.md) for details.
+- `options` (optional) - Configuration object. See [Configuration Guide](./configuration.md) for details, including:
+  - `defaultTtl` - Default entry lifetime
+  - `defaultStaleWindow` - Default stale serving window
+  - `maxSize` - Maximum number of entries allowed
+  - `maxMemorySize` - Maximum memory usage (MB) allowed
+  - `purgeStaleOnGet` / `purgeStaleOnSweep` - Stale entry handling
+  - `onExpire` / `onDelete` - Lifecycle callbacks
 
 ---
 
@@ -33,7 +39,7 @@ set(
     staleWindow?: number;
     tags?: string | string[];
   }
-): void
+): boolean
 ```
 
 **Parameters:**
@@ -44,16 +50,20 @@ set(
 - `options.staleWindow` - How long to serve stale data after expiration (in milliseconds)
 - `options.tags` - One or more tags for group invalidation
 
-**Returns:** Nothing (void)
+**Returns:** `true` if the entry was set or updated, `false` if rejected due to limits or invalid input
 
 **Example:**
 
 ```javascript
-cache.set("user:123", "cached-value", {
+const success = cache.set("user:123", "cached-value", {
   ttl: 5 * 60 * 1000, // Expires in 5 minutes
   staleWindow: 1 * 60 * 1000, // Serve stale for 1 more minute
   tags: ["user:123"], // Tag for invalidation
 });
+
+if (!success) {
+  console.log("Entry rejected: cache at maxSize or maxMemorySize limit");
+}
 ```
 
 **Edge Cases:**
@@ -64,6 +74,9 @@ cache.set("user:123", "cached-value", {
 - If `staleWindow` is larger than `ttl`, the entry can be served as stale for longer than it was fresh
 - Tags are optional; only necessary for group invalidation via `invalidateTag()`
 - Setting a key to `null` is valid; calling `cache.set("user:123", null)` overwrites any previous value and stores `null` as the new value
+- Returns `false` if value is `undefined` (existing value remains untouched if it exists)
+- Returns `false` if new entry would exceed [`maxSize`](./configuration.md#maxsize-number) limit, but updating existing keys always succeeds
+- Returns `false` if new entry would exceed [`maxMemorySize`](./configuration.md#maxmemorysize-number) limit, but updating existing keys always succeeds (not supported in browsers)
 
 ---
 
