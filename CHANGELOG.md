@@ -1,3 +1,19 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+# [0.2.0](https://github.com/neezco/cache/compare/v0.1.1...v0.2.0) (2026-02-09)
+
+
+### Bug Fixes
+
+* add regex for todo-tree to enhance tag recognition ([e0c3292](https://github.com/neezco/cache/commit/e0c3292cd83f5e6d1c5cd9b9c2e199b4a7c9eda0))
+
+
+### Features
+
+* add maxMemorySize configuration and update cache behavior for size limits ([fb3f173](https://github.com/neezco/cache/commit/fb3f173b891fc4f345596904ad82b606e5cbc00c))
+
 ## [0.1.1](https://github.com/neezco/cache/compare/v0.1.0...v0.1.1) (2026-02-09)
 
 
