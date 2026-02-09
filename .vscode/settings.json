@@ -93,5 +93,6 @@
       "foreground": "#2ecc71",
       "background": "#2ecc7115"
     }
-  }
+  },
+  "todo-tree.regex.regex": "(//|/\\*|\\*)\\s*(TODO|FIX|FIXME|BUG|REFACTOR|PENDING|TEST|DOC|NEXT|INFO|NOTE)"
 }
