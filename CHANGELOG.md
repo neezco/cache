@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1](https://github.com/neezco/cache/compare/v0.2.0...v0.2.1) (2026-02-11)
+
+
+### Performance Improvements
+
+* optimize cache entry validation by introducing pre-computed status handling ([bafb6a0](https://github.com/neezco/cache/commit/bafb6a024b0082a1b81f2d0e959c883df4136976))
+
 # [0.2.0](https://github.com/neezco/cache/compare/v0.1.1...v0.2.0) (2026-02-09)
 
 
