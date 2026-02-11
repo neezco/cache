@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.3.0](https://github.com/neezco/cache/compare/v0.2.1...v0.3.0) (2026-02-11)
+
+
+### Features
+
+* enhance cache retrieval with metadata support in `get()` method ([eb198d6](https://github.com/neezco/cache/commit/eb198d66c9e1abda86c448fb81a35f14e376a79c)), closes [#17](https://github.com/neezco/cache/issues/17)
+
 ## [0.2.1](https://github.com/neezco/cache/compare/v0.2.0...v0.2.1) (2026-02-11)
 
 
