@@ -27,7 +27,7 @@ export default defineConfig(
       "bench",
 
       // Configuration files
-      "*.config.{js,ts}",
+      "*.config.{mjs,js,ts}",
 
       // Dependency folders
       "node_modules",

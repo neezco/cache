@@ -1,12 +1,11 @@
 /** @type {import('semantic-release').GlobalConfig} */
 export default {
-  branches: ["main", { name: "develop", prerelease: "beta", channel: "beta" }],
+  branches: ["main", { name: "beta", prerelease: "beta", channel: "beta" }],
   plugins: [
     "@semantic-release/commit-analyzer",
     [
       "@semantic-release/release-notes-generator",
       {
-        preset: "conventionalcommits",
         changelogFile: "CHANGELOG.md",
         presetConfig: {
           types: [
@@ -32,6 +31,11 @@ export default {
     ],
     ["@semantic-release/npm", { npmPublish: true }],
     ["@semantic-release/git", { assets: ["CHANGELOG.md"] }],
-    "@semantic-release/github",
+    [
+      "@semantic-release/github",
+      {
+        assets: ["dist/**", "docs/**", "package.json", "CHANGELOG.md", "README.md", "LICENSE"],
+      },
+    ],
   ],
 };
