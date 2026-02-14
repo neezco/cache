@@ -2,7 +2,7 @@
 export default {
   branches: ["main", { name: "develop", prerelease: "beta", channel: "beta" }],
   plugins: [
-    ["@semantic-release/commit-analyzer", { preset: "conventionalcommits" }],
+    "@semantic-release/commit-analyzer",
     [
       "@semantic-release/release-notes-generator",
       {
