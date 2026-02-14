@@ -69,16 +69,19 @@ describe("invalidateTag", () => {
       expect(cache.has("key3")).toBe(true);
     });
 
-    it("should preserve entry status if tag invalidated but not applied (tag created after entry)", () => {
-      cache.set("key", "value", { ttl: 10000, tags: "user:123" });
-
-      const result1 = cache.get("key", { includeMetadata: true });
-      expect(result1?.status).toBe(ENTRY_STATUS.FRESH);
-
+    it("should preserve entry status if tag was invalidated before the entry existed", () => {
+      vi.useFakeTimers();
+      // 1. Invalidate tag first → tag is created at T0
       cache.invalidateTag("user:123");
 
-      const result2 = cache.get("key", { includeMetadata: true });
-      expect(result2).toBeUndefined();
+      // 2. Create entry at T1 >
+      vi.advanceTimersByTime(1);
+      cache.set("key", "value", { ttl: 10000, tags: "user:123" });
+
+      // 3. Entry should be fresh because the tag is older than the entry
+      const result = cache.get("key", { includeMetadata: true });
+      expect(result?.status).toBe(ENTRY_STATUS.FRESH);
+      vi.useRealTimers();
     });
   });
 
