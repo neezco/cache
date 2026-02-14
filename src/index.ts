@@ -25,9 +25,11 @@ export type {
   GetOptionsWithoutMetadata,
   SetOptions,
   LocalTtlCacheInterface,
-  ENTRY_STATUS,
   PurgeMode,
 } from "./types";
+
+// Re-export public enum and values
+export { ENTRY_STATUS } from "./types";
 
 /**
  * A TTL (Time-To-Live) cache implementation with support for expiration,
@@ -56,7 +58,7 @@ export class LocalTtlCache implements LocalTtlCacheInterface {
   }
 
   get<T = unknown>(key: string): T | undefined;
-  get<T = unknown>(key: string, options: GetOptionsWithMetadata): EntryMetadata<T> | undefined;
+  get<T = unknown>(key: string, options: GetOptionsWithMetadata): EntryMetadata<T>;
   get<T = unknown>(key: string, options: GetOptionsWithoutMetadata): T | undefined;
   get<T = unknown>(
     key: string,

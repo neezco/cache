@@ -5,14 +5,11 @@ import {
   DEFAULT_STALE_WINDOW,
   DEFAULT_TTL,
 } from "../defaults";
+import { resolvePurgeStaleOnGet } from "../resolve-purge-config/get";
+import { resolvePurgeResourceMetric } from "../resolve-purge-config/metric";
+import { resolvePurgeStaleOnSweep } from "../resolve-purge-config/sweep";
 import { startSweep } from "../sweep/sweep";
 import type { CacheOptions, CacheState } from "../types";
-
-import {
-  resolvePurgeResourceMetric,
-  resolvePurgeStaleOnGet,
-  resolvePurgeStaleOnSweep,
-} from "./resolve-purge-config";
 
 let _instanceCount = 0;
 const INSTANCE_WARNING_THRESHOLD = 99;
@@ -59,20 +56,28 @@ export const createCache = (options: CacheOptions = {}): CacheState => {
   }
 
   const resolvedPurgeResourceMetric =
-    purgeResourceMetric ?? resolvePurgeResourceMetric(maxSize, maxMemorySize);
+    purgeResourceMetric ??
+    resolvePurgeResourceMetric({
+      maxSize,
+      maxMemorySize,
+    });
 
-  const resolvedPurgeStaleOnGet = resolvePurgeStaleOnGet(
-    maxSize,
-    maxMemorySize,
-    resolvedPurgeResourceMetric,
-    purgeStaleOnGet,
-  );
-  const resolvedPurgeStaleOnSweep = resolvePurgeStaleOnSweep(
-    maxSize,
-    maxMemorySize,
-    resolvedPurgeResourceMetric,
-    purgeStaleOnSweep,
-  );
+  const resolvedPurgeStaleOnGet = resolvePurgeStaleOnGet({
+    limits: {
+      maxSize,
+      maxMemorySize,
+    },
+    purgeResourceMetric: resolvedPurgeResourceMetric,
+    userValue: purgeStaleOnGet,
+  });
+  const resolvedPurgeStaleOnSweep = resolvePurgeStaleOnSweep({
+    limits: {
+      maxSize,
+      maxMemorySize,
+    },
+    purgeResourceMetric: resolvedPurgeResourceMetric,
+    userValue: purgeStaleOnSweep,
+  });
 
   const state: CacheState = {
     store: new Map(),

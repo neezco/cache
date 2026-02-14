@@ -58,34 +58,56 @@ export interface CacheConfigBase {
   /**
    * Controls stale entry purging behavior on `get()` operations.
    *
+   * Possible values:
    * - `true` → purge stale entries immediately after read.
    * - `false` → retain stale entries after read.
    * - `number (0-1)` → purge when `resourceUsage ≥ threshold` (uses `purgeResourceMetric`).
+   *
+   * Numeric threshold validation:
+   * - Must be 0 < value ≤ 1 (boolean fallback if invalid range)
+   * - Requires purgeResourceMetric to support thresholds (not 'fixed')
+   * - Requires matching configuration limits for the metric:
+   *   * 'size' metric requires maxSize
+   *   * 'memory' metric requires maxMemorySize
+   *   * 'higher' metric requires both maxSize and maxMemorySize
+   * - Invalid numeric values fallback to default: 0.80 (with limits) or false (without)
    *
    * Environment notes:
    * - Backend: `"memory"` and `"higher"` metrics available; frontend: only `"size"`.
    * - Can be overridden per-read via `get(key, { purgeStale })`.
    *
    * Defaults:
-   * - With limits → `0.80` (80% resource usage).
-   * - Without limits → `false`.
+   * - With matching limits → `0.80` (80% resource usage).
+   * - Without matching limits → `false`.
    */
   purgeStaleOnGet: PurgeMode;
 
   /**
    * Controls stale entry purging behavior during sweep operations.
    *
+   * Possible values:
    * - `true` → purge stale entries during sweeps.
    * - `false` → retain stale entries during sweeps.
    * - `number (0-1)` → purge when `resourceUsage ≥ threshold` (uses `purgeResourceMetric`).
    *
+   * Numeric threshold validation:
+   * - Must be 0 < value ≤ 1 (boolean fallback if invalid range)
+   * - Requires purgeResourceMetric to support thresholds (not 'fixed')
+   * - Requires matching configuration limits for the metric:
+   *   * 'size' metric requires maxSize
+   *   * 'memory' metric requires maxMemorySize
+   *   * 'higher' metric requires both maxSize and maxMemorySize
+   * - Invalid numeric values fallback to default: 0.5 (with limits) or true (without)
+   *
+   * Prevents stale entry accumulation when enabled. Without limits, defaults to `true`
+   * to prevent unbounded growth.
+   *
    * Environment notes:
    * - Backend: `"memory"` and `"higher"` metrics available; frontend: only `"size"`.
-   * - Prevents stale entry accumulation when enabled.
    *
    * Defaults:
-   * - With limits → `0.5` (50% resource usage).
-   * - Without limits → `true` (prevent accumulation).
+   * - With matching limits → `0.5` (50% resource usage).
+   * - Without matching limits → `true` (prevent unbounded accumulation).
    */
   purgeStaleOnSweep: PurgeMode;
 
