@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+# [0.5.0](https://github.com/neezco/cache/compare/v0.4.1...v0.5.0) (2026-02-21)
+
+
+### Features
+
+* include createdAt in metadata returned when includeMetadata is true ([b8b51c8](https://github.com/neezco/cache/commit/b8b51c8f74d9801f630fa2fe14bfe8519127791e)), closes [#17](https://github.com/neezco/cache/issues/17)
+
 ## [0.4.1](https://github.com/neezco/cache/compare/v0.4.0...v0.4.1) (2026-02-21)
 
 
