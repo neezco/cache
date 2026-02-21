@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.1](https://github.com/neezco/cache/compare/v0.4.0...v0.4.1) (2026-02-21)
+
+
+### Bug Fixes
+
+* adjust semantic-release title and section configuration for proper changelog grouping ([919729a](https://github.com/neezco/cache/commit/919729a9d4d826e5ea78e7147914fc52f8d12149))
+
 ## 0.4.0 (2026-02-14)
 
 * chore: implement startSweep function to manage cache sweep process ([78ded7a](https://github.com/neezco/cache/commit/78ded7a))
