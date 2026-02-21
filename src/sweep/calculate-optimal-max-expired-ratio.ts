@@ -4,7 +4,7 @@ import {
   MINIMAL_EXPIRED_RATIO,
 } from "../defaults";
 import { interpolate } from "../utils/interpolate";
-import { _metrics, SAFE_MEMORY_LIMIT_RATIO } from "../utils/start-monitor";
+import { _metrics } from "../utils/start-monitor";
 
 /**
  * Calculates the optimal maximum expired ratio based on current memory utilization.
@@ -21,13 +21,11 @@ import { _metrics, SAFE_MEMORY_LIMIT_RATIO } from "../utils/start-monitor";
 export function calculateOptimalMaxExpiredRatio(
   maxAllowExpiredRatio: number = DEFAULT_MAX_EXPIRED_RATIO,
 ): number {
-  const EFFECTIVE_MEMORY_THRESHOLD = EXPIRED_RATIO_MEMORY_THRESHOLD / SAFE_MEMORY_LIMIT_RATIO;
-
   const optimalExpiredRatio = interpolate({
     value: _metrics?.memory.utilization ?? 0,
 
     fromStart: 0, // baseline: memory usage ratio at 0%
-    fromEnd: EFFECTIVE_MEMORY_THRESHOLD, // threshold: memory usage ratio at 80% of safe limit
+    fromEnd: EXPIRED_RATIO_MEMORY_THRESHOLD, // threshold: memory usage ratio at 80% of safe limit
 
     toStart: maxAllowExpiredRatio, // allowed ratio at minimal memory usage
     toEnd: MINIMAL_EXPIRED_RATIO, // allowed ratio at high memory usage (≥80%)
