@@ -227,6 +227,8 @@ export enum ENTRY_STATUS {
 export interface EntryMetadata<T = unknown> {
   /** The cached value. */
   data: T;
+  /** Absolute timestamp (ms) when the entry was created. */
+  createdAt: number;
   /** Absolute timestamp (ms) when entry expires. */
   expirationTime: number;
   /** Absolute timestamp (ms) when stale window ends. */

@@ -89,6 +89,9 @@ interface EntryMetadata<T = unknown> {
   // The cached value.
   data: T;
 
+  // Absolute timestamp when the entry was created (in milliseconds).
+  createdAt: number;
+
   // Absolute timestamp when this entry becomes fully expired (in milliseconds).
   expirationTime: number;
 
@@ -123,6 +126,7 @@ const user = cache.get("user:123");
 const entry = cache.get("user:123", { includeMetadata: true });
 if (entry) {
   console.log(entry.data);
+  console.log(entry.createdAt);
   console.log(entry.status);
   console.log(entry.expirationTime);
   console.log(entry.staleWindowExpiration);

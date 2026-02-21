@@ -69,10 +69,11 @@ export class LocalTtlCache implements LocalTtlCacheInterface {
       if (!entry) return undefined;
 
       const [timestamps, value, tags] = entry;
-      const [, expiresAt, staleExpiresAt] = timestamps;
+      const [createdAt, expiresAt, staleExpiresAt] = timestamps;
 
       return {
         data: value as T,
+        createdAt,
         expirationTime: expiresAt,
         staleWindowExpiration: staleExpiresAt,
         status,

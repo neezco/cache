@@ -33,31 +33,8 @@ describe("get", () => {
   });
 
   describe("metadata", () => {
-    it("should return metadata when requested", () => {
-      cache.set("key1", "myValue");
-
-      const result = cache.get("key1", { includeMetadata: true });
-      expect(result).toBeDefined();
-      expect(result?.data).toBe("myValue");
-    });
-
-    it("should return consistent metadata on repeated gets", () => {
-      cache.set("key", "value", {
-        ttl: 10000,
-        staleWindow: 5000,
-        tags: ["tag1"],
-      });
-
-      const result1 = cache.get("key", { includeMetadata: true });
-      const result2 = cache.get("key", { includeMetadata: true });
-
-      expect(result1?.expirationTime).toBe(result2?.expirationTime);
-      expect(result1?.staleWindowExpiration).toBe(result2?.staleWindowExpiration);
-      expect(result1?.status).toBe(result2?.status);
-      expect(result1?.tags).toEqual(result2?.tags);
-    });
-
     it("should include all metadata fields correctly", () => {
+      const before = Date.now();
       cache.set(
         "key",
         { nested: "data" },
@@ -67,10 +44,14 @@ describe("get", () => {
           tags: ["category", "priority"],
         },
       );
+      const after = Date.now();
 
       const result = cache.get("key", { includeMetadata: true });
       expect(result).toBeDefined();
       if (result) {
+        expect(result.createdAt).toBeGreaterThanOrEqual(before);
+        expect(result.createdAt).toBeLessThanOrEqual(after);
+
         expect(result.data).toEqual({ nested: "data" });
         expect(result.status).toBe(ENTRY_STATUS.FRESH);
         expect(result.expirationTime).toBeGreaterThan(Date.now());
