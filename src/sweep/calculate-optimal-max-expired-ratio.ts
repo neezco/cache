@@ -1,8 +1,4 @@
-import {
-  DEFAULT_MAX_EXPIRED_RATIO,
-  EXPIRED_RATIO_MEMORY_THRESHOLD,
-  MINIMAL_EXPIRED_RATIO,
-} from "../defaults";
+import { DEFAULT_MAX_EXPIRED_RATIO, MINIMAL_EXPIRED_RATIO } from "../defaults";
 import { interpolate } from "../utils/interpolate";
 import { _metrics } from "../utils/start-monitor";
 
@@ -11,8 +7,8 @@ import { _metrics } from "../utils/start-monitor";
  *
  * This function interpolates between `maxAllowExpiredRatio` and `MINIMAL_EXPIRED_RATIO`
  * depending on the memory usage reported by `_metrics`. At low memory usage (0%),
- * the optimal ratio equals `maxAllowExpiredRatio`. As memory usage approaches or exceeds
- * 80% of the memory limit, the optimal ratio decreases toward `MINIMAL_EXPIRED_RATIO`.
+ * the optimal ratio equals `maxAllowExpiredRatio`. At high memory usage
+ * the optimal ratio decreases toward `MINIMAL_EXPIRED_RATIO`.
  *
  * @param maxAllowExpiredRatio - The maximum allowed expired ratio at minimal memory usage.
  * Defaults to `DEFAULT_MAX_EXPIRED_RATIO`.
@@ -25,14 +21,14 @@ export function calculateOptimalMaxExpiredRatio(
     value: _metrics?.memory.utilization ?? 0,
 
     fromStart: 0, // baseline: memory usage ratio at 0%
-    fromEnd: EXPIRED_RATIO_MEMORY_THRESHOLD, // threshold: memory usage ratio at 80% of safe limit
+    fromEnd: 1, // max: memory usage ratio at 100%
 
     toStart: maxAllowExpiredRatio, // allowed ratio at minimal memory usage
-    toEnd: MINIMAL_EXPIRED_RATIO, // allowed ratio at high memory usage (≥80%)
+    toEnd: MINIMAL_EXPIRED_RATIO, // allowed ratio at high memory usage
   });
 
   // At 0% memory usage, the optimalExpiredRatio equals maxAllowExpiredRatio.
-  // At or above 80% memory usage, the optimalExpiredRatio approaches or falls below MINIMAL_EXPIRED_RATIO.
+  // At 100% memory usage, the optimalExpiredRatio equals MINIMAL_EXPIRED_RATIO.
 
   return Math.min(1, Math.max(0, optimalExpiredRatio));
 }

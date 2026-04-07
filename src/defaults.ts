@@ -50,15 +50,8 @@ export const MAX_KEYS_PER_BATCH: number = 1000;
 
 /**
  * Minimal expired ratio enforced during sweeps.
- * Ensures control sweeps run above {@link EXPIRED_RATIO_MEMORY_THRESHOLD}.
  */
 export const MINIMAL_EXPIRED_RATIO: number = 0.05;
-
-/**
- * Memory usage threshold (normalized 0–1) triggering control sweeps.
- * At or above this level, sweeping becomes more aggressive.
- */
-export const EXPIRED_RATIO_MEMORY_THRESHOLD: number = 0.8;
 
 /**
  * Maximum allowed expired ratio when memory usage is low.

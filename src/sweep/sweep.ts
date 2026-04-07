@@ -75,6 +75,10 @@ export const sweep = async (
       // No instance to sweep
       break;
     }
+    if (instanceToSweep.size <= 0) {
+      // skip empty instance
+      continue;
+    }
 
     const { ratio } = _sweepOnce(instanceToSweep, maxKeysPerBatch);
     // Initialize or update `currentExpiredRatios` array for current ratios

@@ -3,7 +3,10 @@ import { describe, it, expect, vi } from "vitest";
 import { LocalTtlCache, ENTRY_STATUS } from "../src/index";
 
 describe("invalidateTag", () => {
-  const cache = new LocalTtlCache();
+  const cache = new LocalTtlCache({
+    purgeStaleOnGet: false,
+    purgeStaleOnSweep: false,
+  });
 
   describe("basic tag invalidation", () => {
     it("should mark entry as EXPIRED when tag is invalidated (default behavior)", () => {

@@ -24,9 +24,11 @@ export function _sweepOnce(
     state._sweepIter = state.store.entries();
   }
 
+  const now = Date.now();
   let processed = 0;
   let expiredCount = 0;
   let staleCount = 0;
+  const shouldPurgeStale = shouldPurge(state.purgeStaleOnSweep, state, "sweep");
 
   for (let i = 0; i < _maxKeysPerBatch; i++) {
     const next = state._sweepIter.next();
@@ -39,8 +41,6 @@ export function _sweepOnce(
     processed += 1;
     const [key, entry] = next.value;
 
-    const now = Date.now();
-
     const status = computeEntryStatus(state, entry, now);
     if (isExpired(state, status, now)) {
       deleteKey(state, key, DELETE_REASON.EXPIRED);
@@ -48,13 +48,13 @@ export function _sweepOnce(
     } else if (isStale(state, status, now)) {
       staleCount += 1;
 
-      if (shouldPurge(state.purgeStaleOnSweep, state, "sweep")) {
+      if (shouldPurgeStale) {
         deleteKey(state, key, DELETE_REASON.STALE);
       }
     }
   }
 
-  const expiredStaleCount = shouldPurge(state.purgeStaleOnSweep, state, "sweep") ? staleCount : 0;
+  const expiredStaleCount = shouldPurgeStale ? staleCount : 0;
   return {
     processed,
     expiredCount,
