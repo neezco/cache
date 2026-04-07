@@ -6,7 +6,7 @@ export default {
     [
       "@semantic-release/release-notes-generator",
       {
-        changelogFile: "CHANGELOG.md",
+        preset: "conventionalcommits",
         presetConfig: {
           types: [
             { type: "feat", section: "🚀 New Features", hidden: false },
@@ -16,21 +16,12 @@ export default {
             { type: "refactor", section: "🔧 Code Refactoring", hidden: false },
             { type: "perf", section: "⚡ Performance Improvements", hidden: false },
             { type: "test", section: "🧪 Test Updates", hidden: false },
-            { type: "chore", section: "📦 Internal Maintenance", hidden: false },
+            { type: "chore", section: "🌀 Miscellaneous", hidden: false },
           ],
         },
       },
     ],
-    [
-      "@semantic-release/changelog",
-      {
-        changelogFile: "CHANGELOG.md",
-        changelogTitle:
-          "# Changelog\n\nAll notable changes to this project will be documented in this file.",
-      },
-    ],
     ["@semantic-release/npm", { npmPublish: true }],
-    ["@semantic-release/git", { assets: ["CHANGELOG.md"] }],
     [
       "@semantic-release/github",
       {
