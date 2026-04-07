@@ -1,6 +1,4 @@
-import { afterEach } from "node:test";
-
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 
 import { OPTIMAL_SWEEP_INTERVAL } from "../src/defaults";
 import { LocalTtlCache } from "../src/index";
