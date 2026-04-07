@@ -22,11 +22,6 @@ export default {
       },
     ],
     ["@semantic-release/npm", { npmPublish: true }],
-    [
-      "@semantic-release/github",
-      {
-        assets: ["dist/**/*", "docs/**/*", "package.json", "CHANGELOG.md", "README.md", "LICENSE"],
-      },
-    ],
+    ["@semantic-release/github"],
   ],
 };
